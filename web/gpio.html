@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/png" href="https://img.icons8.com/ios/50/000000/computer-support.png" />
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Espbot</title>
+
+  <!-- Bootstrap core CSS 
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- Custom styles for this template -->
+  <link href="sidebar.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="border-right side  bg-sidebar" id="sidebar-wrapper">
+      <div class="sidebar-heading">APP NAME </div>
+      <div class="list-group list-group-flush border-right">
+        <a href="index.html" class="list-group-item list-group-item-action bg-sidebar">App dashboard</a>
+        <a href="#" class="list-group-item list-group-item-action bg-sidebar">App settings</a>
+        <a href="events_journal.html" class="list-group-item list-group-item-action bg-sidebar">Events journal</a>
+        <a href="device.html" class="list-group-item list-group-item-action bg-sidebar">Device settings</a>
+        <a href="gpio.html" class="list-group-item list-group-item-action bg-sidebar">Device GPIO</a>
+        <a href="debug.html" class="list-group-item list-group-item-action bg-sidebar">Device Debug</a>
+        <a href="info.html" class="list-group-item list-group-item-action bg-sidebar">Info & Credits</a>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content ################################################################################-->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-dark border-bottom" id=content-navbar>
+        <span id="content-title">GPIO</span>
+        <button class="btn ml-auto" id="menu-toggle">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </nav>
+
+      <div class="container-fluid">
+        <div class="card-columns mt-3">
+          <div class="card border-info">
+            <div class="card-body">
+              <div class="card-title">
+                <div class="row no-gutters">
+                  <h5 class="card-title my-auto"><i class="fa fa-sign-in"></i> <i class="fa fa-sign-out"></i> GPIO</h5>
+                  <button class="btn my-auto ml-auto" id="gpio_refresh">
+                    <i class="fa fa-refresh"></i>
+                  </button>
+                </div>
+              </div>
+              <div id="gpio_list">
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D1</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d1_cfg" onchange="gpio_cfg(1)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d1_value" onchange="gpio_set(1)">
+                    <label class="custom-control-label" for="d1_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D2</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d2_cfg" onchange="gpio_cfg(2)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d2_value" onchange="gpio_set(2)">
+                    <label class="custom-control-label" for="d2_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D3</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d3_cfg" onchange="gpio_cfg(3)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d3_value" onchange="gpio_set(3)">
+                    <label class="custom-control-label" for="d3_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D4</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d4_cfg" onchange="gpio_cfg(4)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d4_value" onchange="gpio_set(4)">
+                    <label class="custom-control-label" for="d4_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D5</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d5_cfg" onchange="gpio_cfg(5)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d5_value" onchange="gpio_set(5)">
+                    <label class="custom-control-label" for="d5_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D6</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d6_cfg" onchange="gpio_cfg(6)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d6_value" onchange="gpio_set(6)">
+                    <label class="custom-control-label" for="d6_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D7</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d7_cfg" onchange="gpio_cfg(7)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d7_value" onchange="gpio_set(7)">
+                    <label class="custom-control-label" for="d7_value"></label>
+                  </div>
+                </div>
+                <div class="row no-gutters">
+                  <span class="my-auto float-left">D8</span>
+                  <div class="btn-group my-auto ml-auto" role="group">
+                    <select class="form-control ml-auto my-auto border-0" id="d8_cfg" onchange="gpio_cfg(8)">
+                      <option value="0"><span class="sr-only">Unprovisioned</span></option>
+                      <option value="1"><span class="sr-only">Input</span></option>
+                      <option value="2"><span class="sr-only">Output</span></option>
+                    </select>
+                  </div>
+                  <div class="custom-control ml-auto my-auto custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="d8_value" onchange="gpio_set(8)">
+                    <label class="custom-control-label" for="d8_value"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Of Page Content #########################################################################-->
+
+  </div>
+  <!-- /#wrapper -->
+  <!-- #spinner while awaiting for page load -->
+  <div class="modal fade" id="awaiting" data-backdrop="static" data-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0" style="background-color: transparent;">
+        <span class="spinner-border mx-auto" role="status" style="width: 3rem; height: 3rem;"></span>
+      </div>
+    </div>
+  </div>
+  <!-- /#spinner while awaiting for page load -->
+  <!-- Bootstrap core JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS, then custom script -->
+  <!-- don't use slim if you need ajax -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    $('#awaiting').modal('show');
+  </script>
+  <script src="shared.js"></script>
+  <script src="gpio.js"></script>
+  <!-- Menu Toggle Script -->
+  <script>
+    $("#menu-toggle").click(function (e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+</body>
+
+</html>
