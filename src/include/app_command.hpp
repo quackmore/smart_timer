@@ -10,7 +10,7 @@
 #ifndef __APP_COMMAND_HPP__
 #define __APP_COMMAND_HPP__
 
-#define MAX_COMMAND_COUNT 50
+#define MAX_COMMAND_COUNT 30
 
 enum command_t
 {

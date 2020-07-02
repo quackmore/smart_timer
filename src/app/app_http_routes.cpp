@@ -323,7 +323,7 @@ static void del_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
     id = atoi(id_str);
     if ((id < 0) || (id > MAX_COMMAND_COUNT))
     {
-        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-49]"), false);
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-29]"), false);
         return;
     }
     int res = command_delete(id);
@@ -351,7 +351,7 @@ static void get_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
     id = atoi(id_str);
     if ((id < 0) || (id > MAX_COMMAND_COUNT))
     {
-        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-49]"), false);
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-29]"), false);
         return;
     }
     struct command *command_ptr = command_read(id);
@@ -414,7 +414,7 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
     id = atoi(id_str);
     if ((id < 0) || (id > MAX_COMMAND_COUNT))
     {
-        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-49]"), false);
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID out of range [0-29]"), false);
         return;
     }
     struct command *command_ptr = command_read(id);
