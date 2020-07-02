@@ -1,10 +1,10 @@
 openapi: 3.0.0
 
 info:
-  title: ESPBOT APIs
-  version: 2.0.0
+  title: Smart Timer APIs
+  version: 1.0.0
   description: >
-    These APIs are for reading, setting and controlling an ESPBOT based APP. 
+    These APIs are for reading, setting and controlling Smart Timer APP. 
 
 servers:
   - url: http://{host}:{port}/{basePath}
@@ -24,6 +24,174 @@ servers:
     description: test device
 
 paths:
+  /command:
+    get:
+      description: Returns the list of the commands on the device.
+      summary: Command list
+      operationId: getCommandList
+      responses:
+        '200':
+          description: The command list
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/commandList'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      description: Create a new command
+      summary: Create a command
+      operationId: createCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/command'
+      responses:
+        '200':
+          description: Command created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/command'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+  /command/{command_id}:
+    get:
+      description: Returns the details of the specified command
+      summary: Find command
+      operationId: getCommand
+      parameters:
+      - name: command_id
+        in: path
+        description: The command id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 49
+        style: simple
+      responses:
+        '200':
+          description: The command details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/command'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      description: Update the details of the specified command
+      summary: Update a command
+      operationId: updateCommand
+      parameters:
+      - name: command_id
+        in: path
+        description: The command id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 49
+        style: simple
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/command'
+      responses:
+        '200':
+          description: Command successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/command'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      description: Delete specified command
+      summary: Delete a command
+      operationId: deleteCommand
+      parameters:
+      - name: command_id
+        in: path
+        description: The command id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 49
+        style: simple
+      responses:
+        '200':
+          description: Command successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/success'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
   /cron:
     get:
       description: Returns cron settings (enabled or disabled)
@@ -967,26 +1135,101 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
-  /test:
-    post:
-      description: Test API, will run a test passing two parameters
-      summary: Test
-      operationId: runTest
+  /relay:
+    get:
+      description: Returns the list of the relay on the device.
+      summary: Relay list
+      operationId: getRelayList
+      responses:
+        '200':
+          description: The relay list
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/relayList'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+  /relay/{relay_id}:
+    get:
+      description: Returns the details of the specified relay
+      summary: Find relay
+      operationId: getRelay
+      parameters:
+      - name: relay_id
+        in: path
+        description: The relay id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 8
+        style: simple
+      responses:
+        '200':
+          description: The relay details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/relay'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      description: Update the details of the specified relay
+      summary: Update a relay
+      operationId: updateRelay
+      parameters:
+      - name: relay_id
+        in: path
+        description: The relay id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 8
+        style: simple
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/testParams'
+              $ref: '#/components/schemas/relay'
       responses:
         '200':
-          description: Successful, returns the test parameters
+          description: Relay successfully modified.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/testParams'
+                $ref: '#/components/schemas/relay'
         '400':
           description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
           content:
             application/json:
               schema:
@@ -1174,45 +1417,108 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
-  /wifi/connect:
-    post:
-      description: Sets the wifi as STATION and connects to the AP saved into config
-      summary: Connect wifi to AP
-      operationId: connectWifi
-      responses:
-        '202':
-          description: Accepted, the device will try to connect to AP
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/success'
-        'default':
-          description: Unexpected error
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/error'
-  /wifi/disconnect:
-    post:
-      description: Disconnects from AP and sets the wifi as AP
-      summary: Disconnect wifi from AP
-      operationId: disconnectWifi
-      responses:
-        '202':
-          description: Accepted, disconnects from AP
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/success'
-        'default':
-          description: Unexpected error
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/error'
 
 components:
   schemas:
+    command:
+      type: object
+      required:
+      - id
+      - enabled
+      - type
+      - duration
+      - relay_id
+      - min
+      - hour
+      - dom
+      - month
+      - dow
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: command id
+          default: 0
+          minimum: 0
+          maximum: 49
+        enabled:
+          type: integer
+          format: int32
+          description: 0 -> enabled, 1 -> disabled
+          default: 1
+          minimum: 0
+          maximum: 1
+        type:
+          type: integer
+          format: int32
+          description: 1 -> switch open,
+                       2 -> switch close,
+                       3 -> pulse open,
+                       4 -> pulse close
+          default: 1
+          minimum: 1    
+          maximum: 4
+        duration:
+          type: integer
+          format: int32
+          description: the pulse duration (ms)
+          default: 0
+          minimum: 0    
+          maximum: 4294967295
+        relay_id:
+          type: integer
+          format: int32
+          description: the relay_id
+          default: 1
+          minimum: 1    
+          maximum: 8
+        min:
+          type: integer
+          format: int32
+          description: minutes (-1 equal '*')
+          default: -1
+          minimum: -1    
+          maximum: 59
+        hour:
+          type: integer
+          format: int32
+          description: hours (-1 equal '*')
+          default: -1
+          minimum: -1    
+          maximum: 23
+        dom:
+          type: integer
+          format: int32
+          description: day of month (0 equal '*')
+          default: 0
+          minimum: 0    
+          maximum: 31
+        month:
+          type: integer
+          format: int32
+          description: month (0 equal '*')
+          default: 0
+          minimum: 0    
+          maximum: 12
+        dow:
+          type: integer
+          format: int32
+          description: day of week (0 equal '*')
+          default: 0
+          minimum: 0  
+          maximum: 7
+      additionalProperties: false
+    commandList:
+      type: object
+      required:
+      - commands
+      properties:
+        commands:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/command'
+      additionalProperties: false
     cron_status:
       type: object
       required:
@@ -1767,6 +2073,61 @@ components:
           minimum: 0
           maximum: 1
       additionalProperties: false
+    relay:
+      type: object
+      required:
+      - pin
+      - reserved
+      - name
+      - logic
+      - status_at_boot
+      properties:
+        pin:
+          type: integer
+          format: int32
+          description: gpio pin
+          default: 1
+          minimum: 1
+          maximum: 8
+        reserved:
+          type: integer
+          format: int32
+          description: 0 -> the relay is available for use, 1 -> the relay is reserved
+          default: 0
+          minimum: 0    
+          maximum: 1
+        name:
+          type: string
+          description: a description of relay use 
+          pattern: '[ -~]{0,31}'
+          minLength: 0
+          maxLength: 31
+        logic:
+          type: integer
+          format: int32
+          description: the relay logic. 0 -> logic_undefined, 1-> pin_low_relay_closed, 2 -> pin_high_relay_closed
+          default: 1
+          minimum: 0    
+          maximum: 2
+        status_at_boot:
+          type: integer
+          format: int32
+          description: an relay status at boot. 0 -> status_undefined, 1-> open, 2 -> closed
+          default: 0
+          minimum: 0    
+          maximum: 2
+      additionalProperties: false
+    relayList:
+      type: object
+      required:
+      - relays
+      properties:
+        relays:
+          type: array
+          maxItems: 8
+          items:
+            $ref: '#/components/schemas/relay'
+      additionalProperties: false
     success:
       type: object
       required:
@@ -1778,27 +2139,6 @@ components:
           pattern: '.{0,128}'
           minLength: 0
           maxLength: 128
-      additionalProperties: false
-    testParams:
-      type: object
-      required:
-      - test_number
-      - test_param
-      properties:
-        test_number:
-          type: integer
-          format: int32
-          description: First test parameter
-          default: 3
-          minimum: -2147483648
-          maximum: 2147483647
-        test_param:
-          type: integer
-          format: int32
-          description: Second test parameter
-          default: 0
-          minimum: -2147483648
-          maximum: 2147483647
       additionalProperties: false
     timedate:
       type: object

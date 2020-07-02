@@ -11,14 +11,13 @@
 extern "C"
 {
 #include "mem.h"
-#include "library_dio_task.h"
-#include "esp8266_io.h"
 }
 
 #include "espbot_cron.hpp"
 #include "espbot_global.hpp"
-#include "library_dht.hpp"
 #include "app.hpp"
+#include "app_relay.hpp"
+#include "app_command.hpp"
 
 /*
  *  APP_RELEASE is coming from git
@@ -32,12 +31,15 @@ extern "C"
 
 char *app_release = APP_RELEASE;
 
-char *app_name = "BLANK";
+char *app_name = "Smart Timer";
 
 void app_init_before_wifi(void)
 {
     // init_dio_task();
     // cron_add_job(CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, temp_log_read);
+    app_relay_init();
+    app_command_init();
+    // cron_add_job(CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, NULL, NULL);
 }
 
 os_timer_t thermostat_start_timer;
