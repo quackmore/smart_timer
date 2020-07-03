@@ -210,7 +210,7 @@ int command_delete(int id)
   return id;
 }
 
-// PERSISTENCY
+// PERSISTENCY 
 // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
 
 #define COMMAND_FILENAME f_str("command.cfg")
