@@ -97,6 +97,14 @@ void app_relay_init(void)
 
   // actual init
   restore_relay_list();
+  // and finally the status at boot
+  for (idx = 0; idx < 8; idx++)
+  {
+    if (relays[idx].reserved)
+      continue;
+    else
+      set_relay_status(&relays[idx]);
+  }
 }
 
 struct relay *get_relay(int pin)
@@ -265,9 +273,6 @@ static bool restore_relay_list(void)
       return false;
     }
     relays[relay_id].status_at_boot = (enum contact_status)atoi(relays_x.get_cur_pair_value());
-    // and finally the status at boot
-    if (!relays[relay_id].reserved)
-      set_relay_status(get_relay(relay_id));
   }
   espmem.stack_mon();
   return true;
