@@ -889,94 +889,6 @@ static void put_api_relay_idx(struct espconn *ptr_espconn, Http_parsed_req *pars
     espmem.stack_mon();
 }
 
-//
-// void run_test(int32 idx, int32 param)
-// {
-//     struct do_seq *seq;
-//     static int event_counter = 0;
-//     INFO("Running test %d with param %d", idx, param);
-//     switch (idx)
-//     {
-//     case 10:
-//     {
-//         fs_printf("printing cron jobs...\n");
-//         cron_print_jobs();
-//         break;
-//     }
-//     case 11:
-//     {
-//         fs_printf("deleting cron jobs... %d\n", param);
-//         cron_del_job(param);
-//         break;
-//     }
-//     case 12:
-//     {
-//         int res = cron_add_job((param % 60),
-//                                (param / 60),
-//                                CRON_STAR,
-//                                CRON_STAR,
-//                                CRON_STAR,
-//                                command_function,
-//                                (void *)command_read(1));
-//         fs_printf("starting cron jobs... %d\n", res);
-//         break;
-//     }
-//     break;
-//     default:
-//         break;
-//     }
-// }
-// static void runTest(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
-// {
-//     ALL("runTest");
-//     int32 test_number;
-//     int32 test_param;
-//     Json_str test_cfg(parsed_req->req_content, parsed_req->content_len);
-//     if (test_cfg.syntax_check() != JSON_SINTAX_OK)
-//     {
-//         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Json bad syntax"), false);
-//         return;
-//     }
-//     if (test_cfg.find_pair(f_str("test_number")) != JSON_NEW_PAIR_FOUND)
-//     {
-//         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Cannot find JSON string 'test_number'"), false);
-//         return;
-//     }
-//     if (test_cfg.get_cur_pair_value_type() != JSON_INTEGER)
-//     {
-//         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("JSON pair with string 'test_number' does not have a INTEGER value type"), false);
-//         return;
-//     }
-//     test_number = atoi(test_cfg.get_cur_pair_value());
-//     if (test_cfg.find_pair(f_str("test_param")) != JSON_NEW_PAIR_FOUND)
-//     {
-//         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Cannot find JSON string 'test_param'"), false);
-//         return;
-//     }
-//     if (test_cfg.get_cur_pair_value_type() != JSON_INTEGER)
-//     {
-//         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("JSON pair with string 'test_param' does not have a INTEGER value type"), false);
-//         return;
-//     }
-//     test_param = atoi(test_cfg.get_cur_pair_value());
-//     espmem.stack_mon();
-//     // {"test_number":4294967295,"test_param":4294967295}
-//     Heap_chunk msg(64, dont_free);
-//     if (msg.ref == NULL)
-//     {
-//         // esp_diag.error(APP_RUNTEST_HEAP_EXHAUSTED, 36);
-//         ERROR("runTest heap exhausted %d", 36);
-//         http_response(ptr_espconn, HTTP_SERVER_ERROR, HTTP_CONTENT_JSON, f_str("Heap exhausted"), false);
-//         return;
-//     }
-//     fs_sprintf(msg.ref,
-//                "{\"test_number\":%d,\"test_param\":%d}",
-//                test_number,
-//                test_param);
-//     http_response(ptr_espconn, HTTP_OK, HTTP_CONTENT_JSON, msg.ref, true);
-//     run_test(test_number, test_param);
-// }
-
 bool app_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
     ALL("app_http_routes");
@@ -1027,10 +939,5 @@ bool app_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
         put_api_relay_idx(ptr_espconn, parsed_req);
         return true;
     }
-    // if ((0 == os_strcmp(parsed_req->url, f_str("/api/test"))) && (parsed_req->req_method == HTTP_POST))
-    // {
-    //     runTest(ptr_espconn, parsed_req);
-    //     return true;
-    // }
     return false;
 }
