@@ -318,7 +318,7 @@ static bool saved_relay_list_not_updated(void)
       return true;
     }
     pin = atoi(relays_x.get_cur_pair_value());
-    if ((pin < 1) || (pin > 7))
+    if ((pin < 1) || (pin > 8))
       return true;
     relay_id = pin - 1;
     if (relays[relay_id].pin != pin)
@@ -351,7 +351,12 @@ static bool saved_relay_list_not_updated(void)
       ERROR("saved_relay_list array[%d] bad sintax", idx);
       return true;
     }
-    if (os_strncmp(relays[relay_id].name, relays_x.get_cur_pair_value(), 31))
+    char relay_name[32];
+    os_memset(relay_name, 0, 32);
+    os_strncpy(relay_name,
+               relays_x.get_cur_pair_value(),
+               ((relays_x.get_cur_pair_value_len() > 31) ? 31 : relays_x.get_cur_pair_value_len()));
+    if (os_strcmp(relays[relay_id].name, relay_name))
       return true;
     // logic
     if (relays_x.find_pair(f_str("logic")) != JSON_NEW_PAIR_FOUND)

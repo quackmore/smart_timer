@@ -456,7 +456,7 @@ static bool saved_command_list_not_updated(void)
     return true;
   }
   Json_array_str commands_array(cfgfile.get_value(), os_strlen(cfgfile.get_value()));
-  if ((commands_array.syntax_check() != JSON_SINTAX_OK) || (commands_array.size() != 8))
+  if ((commands_array.syntax_check() != JSON_SINTAX_OK) || (commands_array.size() != commands_count))
   {
     esp_diag.error(SAVED_COMMAND_LIST_NOT_UPDATED_INCOMPLETE);
     ERROR("saved_command_list_not_updated incorrect array sintax");
