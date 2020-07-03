@@ -57,6 +57,14 @@ void pulse_open_relay(struct relay *relay_p)
   open_relay(relay_p);
 }
 
+void set_relay_status(struct relay *relay_p)
+{
+  if (relay_p->status_at_boot == closed)
+    close_relay(relay_p);
+  if (relay_p->status_at_boot == open)
+    open_relay(relay_p);
+}
+
 void app_relay_init(void)
 {
 
@@ -65,13 +73,19 @@ void app_relay_init(void)
   // default init
   for (idx = 0; idx < 8; idx++)
   {
+    // bare minimum
     relays[idx].pin = (contact_pin)(idx + 1);
+    relays[idx].pulse = 0;
+    // skip reserverd GPIO
+    if (relays[idx].pin == d4)
+      continue;
+    // relay defaults
     relays[idx].reserved = false;
     os_memset(relays[idx].name, 0, 32);
     // timer is not initialized
-    relays[idx].pulse = 0;
     relays[idx].logic = logic_undefined;
     relays[idx].status_at_boot = status_undefined;
+    esp_gpio.config(relays[idx].pin, ESPBOT_GPIO_OUTPUT);
   }
   // reserved GPIO
   // d4 new event led (espbot_diagnostic)
@@ -251,6 +265,9 @@ static bool restore_relay_list(void)
       return false;
     }
     relays[relay_id].status_at_boot = (enum contact_status)atoi(relays_x.get_cur_pair_value());
+    // and finally the status at boot
+    if (!relays[relay_id].reserved)
+      set_relay_status(get_relay(relay_id));
   }
   espmem.stack_mon();
   return true;
