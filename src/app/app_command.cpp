@@ -10,6 +10,7 @@
 extern "C"
 {
 #include "c_types.h"
+#include "user_interface.h"
 }
 
 #include "espbot_config.hpp"
@@ -684,6 +685,7 @@ static void save_command_list(void)
   bool first_time = true;
   for (idx = 0; idx < MAX_COMMAND_COUNT; idx++)
   {
+    system_soft_wdt_feed();
     if (command_list[idx].id < 0)
       continue;
     // ,{"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
