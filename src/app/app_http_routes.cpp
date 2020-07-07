@@ -177,13 +177,11 @@ static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parse
         return;
     }
     exe_time.minutes = atoi(new_command.get_cur_pair_value());
-    if ((exe_time.minutes < -1) || (exe_time.minutes > 59))
+    if ((exe_time.minutes > 59) && (exe_time.minutes != 0xff))
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("minutes value out of range"), false);
         return;
     }
-    if (exe_time.minutes < 0)
-        exe_time.minutes = CRON_STAR;
     // min
     if (new_command.find_pair(f_str("hour")) != JSON_NEW_PAIR_FOUND)
     {
@@ -196,13 +194,11 @@ static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parse
         return;
     }
     exe_time.hours = atoi(new_command.get_cur_pair_value());
-    if ((exe_time.hours < -1) || (exe_time.hours > 23))
+    if ((exe_time.hours > 23) && (exe_time.hours != 0xff))
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("hours value out of range"), false);
         return;
     }
-    if (exe_time.hours < 0)
-        exe_time.hours = CRON_STAR;
     // dom
     if (new_command.find_pair(f_str("dom")) != JSON_NEW_PAIR_FOUND)
     {
@@ -505,14 +501,12 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         return;
     }
     exe_time.minutes = atoi(new_command.get_cur_pair_value());
-    if ((exe_time.minutes < -1) || (exe_time.minutes > 59))
+    if ((exe_time.minutes > 59) && (exe_time.minutes != 0xff))
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("minutes value out of range"), false);
         return;
     }
-    if (exe_time.minutes < 0)
-        exe_time.minutes = CRON_STAR;
-    // min
+    // hours
     if (new_command.find_pair(f_str("hour")) != JSON_NEW_PAIR_FOUND)
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Cannot find JSON string 'hour'"), false);
@@ -524,13 +518,11 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         return;
     }
     exe_time.hours = atoi(new_command.get_cur_pair_value());
-    if ((exe_time.hours < -1) || (exe_time.hours > 23))
+    if ((exe_time.hours > 23) && (exe_time.hours != 0xff))
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("hours value out of range"), false);
         return;
     }
-    if (exe_time.hours < 0)
-        exe_time.hours = CRON_STAR;
     // dom
     if (new_command.find_pair(f_str("dom")) != JSON_NEW_PAIR_FOUND)
     {

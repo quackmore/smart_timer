@@ -1462,8 +1462,8 @@ components:
           type: integer
           format: int32
           description: the pulse duration (ms)
-          default: 0
-          minimum: 0    
+          default: 60000
+          minimum: 10    
           maximum: 4294967295
         relay_id:
           type: integer

@@ -1,4 +1,4 @@
-// debug.js
+// gpio.js
 
 // spinner while awaiting for page load
 $(document).ready(function () {
