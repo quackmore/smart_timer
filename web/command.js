@@ -62,7 +62,7 @@ function esp_put_command_idx(ii) {
     contentType: 'application/json',
     data: jsonify_command(),
     crossDomain: esp8266.cors,
-    timeout: 2000,
+    timeout: 5000,
     success: function () {
       $('#commandModal').modal('hide');
       update_commands_list();
@@ -81,7 +81,7 @@ function esp_post_command() {
     contentType: 'application/json',
     data: jsonify_command(),
     crossDomain: esp8266.cors,
-    timeout: 2000,
+    timeout: 5000,
     success: function () {
       $('#commandModal').modal('hide');
       update_commands_list();
@@ -97,7 +97,7 @@ function esp_del_command_idx(ii) {
     type: 'DELETE',
     url: esp8266.url + '/api/command/' + ii,
     crossDomain: esp8266.cors,
-    timeout: 2000,
+    timeout: 5000,
     success: function () {
       update_commands_list();
     },
@@ -379,6 +379,7 @@ $('#add_command').on('click', function () {
   current_id = -1;
   $('#commandModalTitle').text('New command');
   $('#command_enabled').val(1);
+  $('#command_type').val(1);
   $('#command_duration_group').addClass('d-none');
   $('#command_min').val('');
   $('#command_min').prop('disabled', true);

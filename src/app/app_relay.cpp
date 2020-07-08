@@ -210,7 +210,7 @@ static bool restore_relay_list(void)
       return false;
     }
     pin = atoi(relays_x.get_cur_pair_value());
-    if ((pin < 1) || (pin > 7))
+    if ((pin < 1) || (pin > 8))
       return false;
     relay_id = pin - 1;
     relays[relay_id].pin = (enum contact_pin)pin;
