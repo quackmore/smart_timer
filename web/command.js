@@ -136,7 +136,7 @@ function command_type(val) {
 
 function command_duration(type, val) {
   if ((type == '3') || (type == '4'))
-    return val;
+    return (val).toLocaleString('it');
   else
     return '-';
 }
@@ -282,11 +282,11 @@ function update_commands_list() {
         data.commands[ii].name +
         '</td><td>' +
         command_type(data.commands[ii].type) +
-        '</td><td>' +
-        data.commands[ii].relay_id +
-        '</td><td> ' +
-        command_duration(data.commands[ii].type, data.commands[ii].duration) +
         '</td><td>D' +
+        data.commands[ii].relay_id +
+        '</td><td>' +
+        command_duration(data.commands[ii].type, data.commands[ii].duration) +
+        '</td><td>' +
         command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow) +
         '<td><button class="btn btn-sm" onclick="modify_command(' +
         data.commands[ii].id +

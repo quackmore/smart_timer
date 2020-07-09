@@ -105,6 +105,7 @@ void app_relay_init(void)
     default_init();
 
   // and finally the status at boot
+  int idx;
   for (idx = 0; idx < 8; idx++)
   {
     if (relays[idx].reserved)
