@@ -1425,6 +1425,7 @@ components:
       required:
       - id
       - enabled
+      - name
       - type
       - duration
       - relay_id
@@ -1448,6 +1449,12 @@ components:
           default: 1
           minimum: 0
           maximum: 1
+        name:
+          type: string
+          description: command description
+          pattern: '[ -~]{0,31}'
+          minLength: 0
+          maxLength: 31
         type:
           type: integer
           format: int32

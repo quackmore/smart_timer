@@ -23,6 +23,7 @@ enum command_t
 struct command
 {
   int id;
+  char name[32];
   int job_id;
   bool enabled;
   enum command_t type;
@@ -38,6 +39,7 @@ void command_function(void *);
 // returns command id
 // or -1 on error
 int command_create(bool enabled,
+                  char *name,
                   enum command_t type,
                   struct date *exe_time,
                   enum contact_pin pin,
@@ -48,6 +50,7 @@ struct command *command_read(int id);
 // or -1 on error
 int command_update(int id,
                   bool enabled,
+                  char *name,
                   enum command_t type,
                   struct date *exe_time,
                   enum contact_pin pin,

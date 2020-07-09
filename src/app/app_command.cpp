@@ -54,7 +54,12 @@ void app_command_init(void)
     command_list[idx].id = -1;
   }
   // actual init
-  restore_command_list();
+  if (!restore_command_list())
+    // in case of errors reset to default
+    for (idx = 0; idx < MAX_COMMAND_COUNT; idx++)
+    {
+      command_list[idx].id = -1;
+    }
 }
 
 void command_function(void *param)
@@ -99,6 +104,7 @@ static int get_first_free_id(void)
 }
 
 int command_create(bool enabled,
+                   char *name,
                    enum command_t type,
                    struct date *exe_time,
                    enum contact_pin pin,
@@ -110,6 +116,8 @@ int command_create(bool enabled,
     return id;
   command_list[id].id = id;
   command_list[id].enabled = enabled;
+  os_memset(command_list[id].name, 0, 32);
+  os_strncpy(command_list[id].name, name, 31);
   command_list[id].type = type;
   command_list[id].exe_time.minutes = exe_time->minutes;
   command_list[id].exe_time.hours = exe_time->hours;
@@ -145,6 +153,7 @@ struct command *command_read(int id)
 
 int command_update(int id,
                    bool enabled,
+                   char *name,
                    enum command_t type,
                    struct date *exe_time,
                    enum contact_pin pin,
@@ -166,6 +175,8 @@ int command_update(int id,
     cron_del_job(command_list[idx].job_id);
   }
   command_list[idx].enabled = enabled;
+  os_memset(command_list[id].name, 0, 32);
+  os_strncpy(command_list[id].name, name, 31);
   command_list[idx].type = type;
   command_list[idx].exe_time.minutes = exe_time->minutes;
   command_list[idx].exe_time.hours = exe_time->hours;
@@ -211,8 +222,8 @@ int command_delete(int id)
   return id;
 }
 
-// PERSISTENCY 
-// {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+// PERSISTENCY
+// {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
 
 #define COMMAND_FILENAME f_str("command.cfg")
 
@@ -263,18 +274,18 @@ static bool restore_command_list(void)
       return false;
     }
     Json_str commands_x(commands_array.get_elem(idx), commands_array.get_elem_len(idx));
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     // id
     if (commands_x.find_pair(f_str("id")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] id not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] id not INTEGER", idx);
       return false;
     }
     id = atoi(commands_x.get_cur_pair_value());
@@ -286,27 +297,44 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("enabled")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] enabled not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] enabled not INTEGER", idx);
       return false;
     }
     command_list[command_id].enabled = atoi(commands_x.get_cur_pair_value());
+    // name
+    if (commands_x.find_pair(f_str("name")) != JSON_NEW_PAIR_FOUND)
+    {
+      esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
+      ERROR("restore_command_list array[%d] name not found", idx);
+      return false;
+    }
+    if (commands_x.get_cur_pair_value_type() != JSON_STRING)
+    {
+      esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
+      ERROR("restore_command_list array[%d] name not STRING", idx);
+      return false;
+    }
+    os_memset(command_list[command_id].name, 0, 32);
+    os_strncpy(command_list[command_id].name,
+               commands_x.get_cur_pair_value(),
+               ((commands_x.get_cur_pair_value_len() > 31) ? 31 : commands_x.get_cur_pair_value_len()));
     // type
     if (commands_x.find_pair(f_str("type")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] type not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] type not INTEGER", idx);
       return false;
     }
     command_list[command_id].type = (enum command_t)atoi(commands_x.get_cur_pair_value());
@@ -314,13 +342,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("duration")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] duration not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] duration not INTEGER", idx);
       return false;
     }
     command_list[command_id].duration = atoi(commands_x.get_cur_pair_value());
@@ -328,13 +356,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("relay_id")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] relay_id not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] relay_id not INTEGER", idx);
       return false;
     }
     command_list[command_id].output = get_relay(atoi(commands_x.get_cur_pair_value()));
@@ -342,13 +370,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("min")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] min not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] min not INTEGER", idx);
       return false;
     }
     command_list[command_id].exe_time.minutes = atoi(commands_x.get_cur_pair_value());
@@ -356,13 +384,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("hour")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] hour not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] hor not INTEGER", idx);
       return false;
     }
     command_list[command_id].exe_time.hours = atoi(commands_x.get_cur_pair_value());
@@ -370,13 +398,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("dom")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] dom not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] dom not INTEGER", idx);
       return false;
     }
     command_list[command_id].exe_time.day_of_month = atoi(commands_x.get_cur_pair_value());
@@ -384,13 +412,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("month")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] month not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] month not INTEGER", idx);
       return false;
     }
     command_list[command_id].exe_time.month = atoi(commands_x.get_cur_pair_value());
@@ -398,13 +426,13 @@ static bool restore_command_list(void)
     if (commands_x.find_pair(f_str("dow")) != JSON_NEW_PAIR_FOUND)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] dow not found", idx);
       return false;
     }
     if (commands_x.get_cur_pair_value_type() != JSON_INTEGER)
     {
       esp_diag.error(RESTORE_COMMAND_LIST_INCOMPLETE, idx);
-      ERROR("restore_command_list array[%d] bad sintax", idx);
+      ERROR("restore_command_list array[%d] dow not INTEGER", idx);
       return false;
     }
     command_list[command_id].exe_time.day_of_week = atoi(commands_x.get_cur_pair_value());
@@ -475,7 +503,7 @@ static bool saved_command_list_not_updated(void)
       return true;
     }
     Json_str commands_x(commands_array.get_elem(idx), commands_array.get_elem_len(idx));
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     // id
     if (commands_x.find_pair(f_str("id")) != JSON_NEW_PAIR_FOUND)
     {
@@ -509,6 +537,26 @@ static bool saved_command_list_not_updated(void)
       return true;
     }
     if (command_list[command_id].enabled != atoi(commands_x.get_cur_pair_value()))
+      return true;
+    // name
+    if (commands_x.find_pair(f_str("name")) != JSON_NEW_PAIR_FOUND)
+    {
+      esp_diag.error(SAVED_COMMAND_LIST_NOT_UPDATED_INCOMPLETE, idx);
+      ERROR("restore_command_list array[%d] bad sintax", idx);
+      return true;
+    }
+    if (commands_x.get_cur_pair_value_type() != JSON_STRING)
+    {
+      esp_diag.error(SAVED_COMMAND_LIST_NOT_UPDATED_INCOMPLETE, idx);
+      ERROR("restore_command_list array[%d] bad sintax", idx);
+      return true;
+    }
+    char command_name[32];
+    os_memset(command_name, 0, 32);
+    os_strncpy(command_name,
+               commands_x.get_cur_pair_value(),
+               ((commands_x.get_cur_pair_value_len() > 31) ? 31 : commands_x.get_cur_pair_value_len()));
+    if (os_strcmp(command_list[command_id].name, command_name))
       return true;
     // type
     if (commands_x.find_pair(f_str("type")) != JSON_NEW_PAIR_FOUND)
@@ -688,10 +736,11 @@ static void save_command_list(void)
     system_soft_wdt_feed();
     if (command_list[idx].id < 0)
       continue;
-    // ,{"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
-    char buffer[(89 + 1 +
+    // ,{"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    char buffer[(99 + 1 +
                  2 +
                  1 +
+                 32 +
                  2 +
                  10 +
                  1 +
@@ -710,9 +759,12 @@ static void save_command_list(void)
       fs_sprintf(buffer, ",");
     }
     fs_sprintf(buffer + os_strlen(buffer),
-               "{\"id\":%d,\"enabled\":%d,\"type\":%d,\"duration\":%d,",
+               "{\"id\":%d,\"enabled\":%d,\"name\":\"%s\",",
                command_list[idx].id,
                command_list[idx].enabled,
+               command_list[idx].name);
+    fs_sprintf(buffer + os_strlen(buffer),
+               "\"type\":%d,\"duration\":%d,",
                command_list[idx].type,
                command_list[idx].duration);
     fs_sprintf(buffer + os_strlen(buffer),

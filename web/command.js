@@ -28,7 +28,7 @@ function esp_get_command_list(success_cb) {
     url: esp8266.url + '/api/command',
     dataType: 'json',
     crossDomain: esp8266.cors,
-    timeout: 2000,
+    timeout: 5000,
     success: function (data) {
       success_cb(data);
     },
@@ -44,7 +44,7 @@ function esp_get_command_idx(ii, success_cb) {
     url: esp8266.url + '/api/command/' + ii,
     dataType: 'json',
     crossDomain: esp8266.cors,
-    timeout: 2000,
+    timeout: 3000,
     success: function (data) {
       success_cb(data);
     },
@@ -274,10 +274,12 @@ function command_when(min, hour, dom, month, dow) {
 function update_commands_list() {
   esp_get_command_list(function (data) {
     $("#commands_table").empty();
-    $("#commands_table").append('<thead><tr><th scope="col">En.</th><th scope="col">Type</th><th scope="col">Duration [ms]</th><th scope="col">Contact</th><th scope="col">When</th><th scope="col">Actions</th></tr></thead><tbody>');
+    $("#commands_table").append('<thead><tr><th scope="col">En.</th><th scope="col">Description</th><th scope="col">Type</th><th scope="col">Duration [ms]</th><th scope="col">Contact</th><th scope="col">When</th><th scope="col">Actions</th></tr></thead><tbody>');
     for (var ii = 0; ii < data.commands.length; ii++) {
       $("#commands_table").append('<tr><td>' +
         command_enabled(data.commands[ii].enabled) +
+        '</td><td>' +
+        data.commands[ii].name +
         '</td><td>' +
         command_type(data.commands[ii].type) +
         '</td><td>' +
@@ -301,6 +303,7 @@ var current_id;
 function update_command_idx(idx) {
   esp_get_command_idx(idx, function (data) {
     $('#command_enabled').val(data.enabled);
+    $('#command_name').val(data.name);
     $('#command_type').val(data.type);
     $('#command_duration').val(data.duration);
     if (($('#command_type').val() == 1) || ($('#command_type').val() == 2))
@@ -379,6 +382,7 @@ $('#add_command').on('click', function () {
   current_id = -1;
   $('#commandModalTitle').text('New command');
   $('#command_enabled').val(1);
+  $('#command_name').val("");
   $('#command_type').val(1);
   $('#command_duration_group').addClass('d-none');
   $('#command_min').val('');
@@ -585,6 +589,7 @@ function command_dow_val() {
 function jsonify_command() {
   return JSON.stringify({
     enabled: parseInt($('#command_enabled').val()),
+    name: $('#command_name').val(),
     type: parseInt($('#command_type').val()),
     duration: parseInt($('#command_duration').val()),
     relay_id: parseInt($('#command_relay_id').val()),

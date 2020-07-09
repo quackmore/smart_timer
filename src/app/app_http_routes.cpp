@@ -34,7 +34,7 @@ extern "C"
 static void get_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
     // {"commands":[]}
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     ALL("get_api_command");
     int command_count = 0;
     int idx;
@@ -45,8 +45,8 @@ static void get_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed
         if (command_ptr)
             command_count++;
     }
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
-    int str_len = 15 + (command_count * 88) + (command_count * (2 + 1 + 2 + 10 + 2 + 3 + 3 + 2 + 2 + 1)) + 1;
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    int str_len = 15 + (command_count * 98) + (command_count * (2 + 1 + 32 + 2 + 10 + 2 + 3 + 3 + 2 + 2 + 1)) + 1;
     Heap_chunk msg(str_len, dont_free);
     if (msg.ref == NULL)
     {
@@ -60,7 +60,7 @@ static void get_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed
     bool first_element = true;
     for (idx = 0; idx < MAX_COMMAND_COUNT; idx++)
     {
-        // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+        // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
         command_ptr = command_read(idx);
         if (command_ptr == NULL)
             continue;
@@ -69,9 +69,10 @@ static void get_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed
         else
             fs_sprintf(msg.ref + os_strlen(msg.ref), ",");
         fs_sprintf(msg.ref + os_strlen(msg.ref),
-                   "{\"id\":%d,\"enabled\":%d,\"type\":%d,",
+                   "{\"id\":%d,\"enabled\":%d,\"name\":\"%s\",\"type\":%d,",
                    command_ptr->id,
                    command_ptr->enabled,
+                   command_ptr->name,
                    command_ptr->type);
         fs_sprintf(msg.ref + os_strlen(msg.ref),
                    "\"duration\":%d,\"relay_id\":%d,\"min\":%d,",
@@ -93,7 +94,7 @@ static void get_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed
 
 static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     ALL("post_api_command");
     Json_str new_command(parsed_req->req_content, parsed_req->content_len);
     if (new_command.syntax_check() != JSON_SINTAX_OK)
@@ -113,6 +114,22 @@ static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parse
         return;
     }
     bool enabled = ((atoi(new_command.get_cur_pair_value()) == 0) ? false : true);
+    // name
+    if (new_command.find_pair(f_str("name")) != JSON_NEW_PAIR_FOUND)
+    {
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Cannot find JSON string 'name'"), false);
+        return;
+    }
+    if (new_command.get_cur_pair_value_type() != JSON_STRING)
+    {
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("JSON pair with string 'name' does not have a STRING type"), false);
+        return;
+    }
+    char name[32];
+    os_memset(name, 0, 32);
+    os_strncpy(name,
+               new_command.get_cur_pair_value(),
+               ((new_command.get_cur_pair_value_len() > 31) ? 31 : new_command.get_cur_pair_value_len()));
     // type
     if (new_command.find_pair(f_str("type")) != JSON_NEW_PAIR_FOUND)
     {
@@ -260,15 +277,16 @@ static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parse
     }
     if (exe_time.day_of_week == 0)
         exe_time.day_of_week = CRON_STAR;
-    int id = command_create(enabled, type, &exe_time, relay_id, duration);
+    int id = command_create(enabled, name, type, &exe_time, relay_id, duration);
     if (id < 0)
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Error creating new command"), false);
         return;
     }
-    int str_len = 88 + 1 +
+    int str_len = 98 + 1 +
                   2 +
                   1 +
+                  32 +
                   2 +
                   10 +
                   1 +
@@ -286,9 +304,10 @@ static void post_api_command(struct espconn *ptr_espconn, Http_parsed_req *parse
         return;
     }
     fs_sprintf(msg.ref,
-               "{\"id\":%d,\"enabled\":%d,\"type\":%d,",
+               "{\"id\":%d,\"enabled\":%d,\"name\":\"%s\",\"type\":%d,",
                id,
                enabled,
+               name,
                type);
     fs_sprintf(msg.ref + os_strlen(msg.ref),
                "\"duration\":%d,\"relay_id\":%d,\"min\":%d,",
@@ -335,7 +354,7 @@ static void del_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
 
 static void get_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     ALL("get_api_command_idx");
     int id;
     char *id_str = parsed_req->url + os_strlen(f_str("/api/command/"));
@@ -356,9 +375,10 @@ static void get_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("command ID not found"), false);
         return;
     }
-    int str_len = 88 + 1 +
+    int str_len = 98 + 1 +
                   2 +
                   1 +
+                  32 +
                   2 +
                   10 +
                   1 +
@@ -376,9 +396,10 @@ static void get_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         return;
     }
     fs_sprintf(msg.ref,
-               "{\"id\":%d,\"enabled\":%d,\"type\":%d,",
+               "{\"id\":%d,\"enabled\":%d,\"name\":\"%s\",\"type\":%d,",
                command_ptr->id,
                command_ptr->enabled,
+               command_ptr->name,
                command_ptr->type);
     fs_sprintf(msg.ref + os_strlen(msg.ref),
                "\"duration\":%d,\"relay_id\":%d,\"min\":%d,",
@@ -398,7 +419,7 @@ static void get_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
 
 static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
-    // {"id":,"enabled":,"type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
+    // {"id":,"enabled":,"name":"","type":,"duration":,"relay_id":,"min":,"hour":,"dom":,"month":,"dow":}
     ALL("put_api_command_idx");
     int id;
     char *id_str = parsed_req->url + os_strlen(f_str("/api/command/"));
@@ -437,6 +458,22 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         return;
     }
     bool enabled = ((atoi(new_command.get_cur_pair_value()) == 0) ? false : true);
+    // name
+    if (new_command.find_pair(f_str("name")) != JSON_NEW_PAIR_FOUND)
+    {
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Cannot find JSON string 'name'"), false);
+        return;
+    }
+    if (new_command.get_cur_pair_value_type() != JSON_STRING)
+    {
+        http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("JSON pair with string 'name' does not have a STRING type"), false);
+        return;
+    }
+    char name[32];
+    os_memset(name, 0, 32);
+    os_strncpy(name,
+               new_command.get_cur_pair_value(),
+               ((new_command.get_cur_pair_value_len() > 31) ? 31 : new_command.get_cur_pair_value_len()));
     // type
     if (new_command.find_pair(f_str("type")) != JSON_NEW_PAIR_FOUND)
     {
@@ -584,15 +621,16 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
     }
     if (exe_time.day_of_week == 0)
         exe_time.day_of_week = CRON_STAR;
-    int res = command_update(id, enabled, type, &exe_time, relay_id, duration);
+    int res = command_update(id, enabled, name, type, &exe_time, relay_id, duration);
     if (res < 0)
     {
         http_response(ptr_espconn, HTTP_BAD_REQUEST, HTTP_CONTENT_JSON, f_str("Error updating command"), false);
         return;
     }
-    int str_len = 88 + 1 +
+    int str_len = 98 + 1 +
                   2 +
                   1 +
+                  32 +
                   2 +
                   10 +
                   1 +
@@ -601,6 +639,7 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
                   2 +
                   2 +
                   1;
+
     Heap_chunk msg(str_len, dont_free);
     if (msg.ref == NULL)
     {
@@ -610,9 +649,10 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
         return;
     }
     fs_sprintf(msg.ref,
-               "{\"id\":%d,\"enabled\":%d,\"type\":%d,",
+               "{\"id\":%d,\"enabled\":%d,\"name\":\"%s\",\"type\":%d,",
                id,
                enabled,
+               name,
                type);
     fs_sprintf(msg.ref + os_strlen(msg.ref),
                "\"duration\":%d,\"relay_id\":%d,\"min\":%d,",
