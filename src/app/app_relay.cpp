@@ -65,9 +65,8 @@ void set_relay_status(struct relay *relay_p)
     open_relay(relay_p);
 }
 
-void app_relay_init(void)
+static void default_init(void)
 {
-
   int idx;
   // init relays
   // default init
@@ -94,9 +93,17 @@ void app_relay_init(void)
   os_strcpy(cur_relay->name, f_str("new_event"));
   cur_relay->logic = pin_low_relay_closed;
   cur_relay->status_at_boot = open;
+}
+
+void app_relay_init(void)
+{
+  default_init();
 
   // actual init
-  restore_relay_list();
+  if (!restore_relay_list())
+    // reset to default
+    default_init();
+
   // and finally the status at boot
   for (idx = 0; idx < 8; idx++)
   {

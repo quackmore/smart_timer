@@ -274,7 +274,7 @@ function command_when(min, hour, dom, month, dow) {
 function update_commands_list() {
   esp_get_command_list(function (data) {
     $("#commands_table").empty();
-    $("#commands_table").append('<thead><tr><th scope="col">En.</th><th scope="col">Description</th><th scope="col">Type</th><th scope="col">Duration [ms]</th><th scope="col">Contact</th><th scope="col">When</th><th scope="col">Actions</th></tr></thead><tbody>');
+    $("#commands_table").append('<thead><tr><th scope="col">En.</th><th scope="col">Description</th><th scope="col">Type</th><th scope="col">Contact</th><th scope="col">Duration [ms]</th><th scope="col">When</th><th scope="col">Actions</th></tr></thead><tbody>');
     for (var ii = 0; ii < data.commands.length; ii++) {
       $("#commands_table").append('<tr><td>' +
         command_enabled(data.commands[ii].enabled) +
@@ -283,10 +283,10 @@ function update_commands_list() {
         '</td><td>' +
         command_type(data.commands[ii].type) +
         '</td><td>' +
-        command_duration(data.commands[ii].type, data.commands[ii].duration) +
-        '</td><td>D' +
         data.commands[ii].relay_id +
         '</td><td> ' +
+        command_duration(data.commands[ii].type, data.commands[ii].duration) +
+        '</td><td>D' +
         command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow) +
         '<td><button class="btn btn-sm" onclick="modify_command(' +
         data.commands[ii].id +
