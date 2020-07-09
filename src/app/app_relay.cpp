@@ -90,7 +90,7 @@ static void default_init(void)
   // d4 new event led (espbot_diagnostic)
   struct relay *cur_relay = get_relay(d4);
   cur_relay->reserved = true;
-  os_strcpy(cur_relay->name, f_str("new_event"));
+  os_strcpy(cur_relay->name, f_str("Device New Event"));
   cur_relay->logic = pin_low_relay_closed;
   cur_relay->status_at_boot = open;
 }

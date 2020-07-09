@@ -273,28 +273,24 @@ function command_when(min, hour, dom, month, dow) {
 
 function update_commands_list() {
   esp_get_command_list(function (data) {
-    $("#commands_table").empty();
-    $("#commands_table").append('<thead><tr><th scope="col">En.</th><th scope="col">Description</th><th scope="col">Type</th><th scope="col">Contact</th><th scope="col">Duration [ms]</th><th scope="col">When</th><th scope="col">Actions</th></tr></thead><tbody>');
+    var table_data = [];
     for (var ii = 0; ii < data.commands.length; ii++) {
-      $("#commands_table").append('<tr><td>' +
-        command_enabled(data.commands[ii].enabled) +
-        '</td><td>' +
-        data.commands[ii].name +
-        '</td><td>' +
-        command_type(data.commands[ii].type) +
-        '</td><td>D' +
-        data.commands[ii].relay_id +
-        '</td><td>' +
-        command_duration(data.commands[ii].type, data.commands[ii].duration) +
-        '</td><td>' +
-        command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow) +
-        '<td><button class="btn btn-sm" onclick="modify_command(' +
+      var obj = new Object();
+      obj.en = command_enabled(data.commands[ii].enabled);
+      obj.desc = data.commands[ii].name;
+      obj.type = command_type(data.commands[ii].type);
+      obj.contact = 'D' + data.commands[ii].relay_id;
+      obj.duration = command_duration(data.commands[ii].type, data.commands[ii].duration);
+      obj.when = command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow);
+      obj.actions = '<button class="btn btn-sm" onclick="modify_command(' +
         data.commands[ii].id +
         ')"><i class="fa fa-pencil-square-o"></i></button><button class="btn btn-sm" onclick="delete_command(' +
         data.commands[ii].id +
-        ')"><i class="fa fa-trash-o"></i></button></td></tr>');
+        ')"><i class="fa fa-trash-o"></i></button>';
+      table_data.push(obj);
     }
-    $("#commands_table").append('</tbody>');
+    $("#commands_table").bootstrapTable({ data: table_data });
+    $("#commands_table").bootstrapTable('load', table_data);
   });
 }
 
