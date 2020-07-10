@@ -1,57 +1,91 @@
-# espbot_2.0
+# SMART TIMER
 
-## Summary
+A simple app based on [ESPBOT](https://github.com/quackmore/espbot_2.0) and WEMOS D1 Mini.
 
-Library built on Espressif NON-OS SDK with common functions for esp8266 apps.
+The timer allows to control up to 7 contacts.
+Up to 30 commands can be defined to switch the contacts CLOSE or OPEN based on time and date.
+Time and date precision is guaranteed by SNTP.
 
-## Features
+## Using the APP
 
-+ configuration persistency
-+ cron (linux style)
-+ customizable logger over serial interface
-+ customizable diagnostic events logger (in memory, available through http)
-+ digital I/O provisioning and management
-+ json
-+ linked lists
-+ mDns
-+ macros for storing strings into flash and save on RAM memory
-+ memory monitor (stack and heap)
-+ OTA
-+ queues
-+ customizable profiler over serial interface
-+ SPIFFS
-+ time and date with or without SNTP
-+ wifi management (chromecast style)
-+ WEBCLIENT
-+ customizable WEBSERVER
+### Configuring the contacts
 
-## Memory usage
+Smart Timer uses WEMOS D1 Mini GPIO from D1 to D8.
 
-+ about 30 kB of RAM are available to user application (while idle more than 43 kB are available but under stress conditions, for both SDK and ESPBOT, available memory got reduced by 10 kB and a little more)
-+ ESPBOT uses 8 bytes of RTC memory, leaving 504 bytes available to user application
+D4 (connected to the WEMOS led) is reserved for signaling anomalies on the device. The led is switched on when an unexpected condition is met (e.g. WIFI disconnection, configuration errors, ...).
 
-## REST APIs
+Each other GPIO can be configured using the web interface, connecting to the device with a browser.
 
-Espbot REST apis are detailed by [espbot_api.yaml](api/espbot_api.yaml).  
-Open the file with the [Swagger online editor](https://editor.swagger.io/) or (better) with Visual Studio [Swagger Viewer](https://marketplace.visualstudio.com/items?itemName=Arjun.swagger-viewer) extension for description and use.
+![Contact list](pics/contact_list.png "Contact List")
 
-## Using ESPBOT
+Each contact can be assigned a description (31 chars), the logic (pin voltage LOW -> contact closed or pin voltage HIGH -> contact closed) and the default status (at boot) (OPEN or CLOSED).
+
+### Contacts constraints
+
+Please consider that using ESP8266 and WEMOS D1 Mini, as is, you will notice the following behavior on reset (and boot).
+
+D1, D2, D5, D6, D7 voltage is high on reset and after (and obviously at boot), so the best way to use them is to set the logic as (pin voltage LOW -> contact CLOSED) and the default status as OPEN.
+
+D3 voltage shows a low pulse at reset then goes high, better not use this GPIO as it will cause a contact pulse everytime the device is reset.
+
+D8 voltage is low at reset and after (and obviously at boot), so the best way to use it is to set the logic as (pin voltage HIGH -> contact CLOSED) and the default status as OPEN.
+
+### Defining the commands
+
+Up to 30 commands can be configured using the web interface, connecting to the device with a browser.
+
+![Command list](pics/command_list.png "Command List")
+
+Each command can be assigned:
+
+- an 'enabled' flag, meaning you can define commands in advance and then avoid execution just disabling them
+- a command description (up to 32 chars)
+- the contact that has to be controlled
+- the action to perform on the contact (OPEN, CLOSE, 'pulse OPEN' or 'pulse CLOSE')
+- when a pulse action is selected the pulse duration in milliseconds
+- the time and date the command has to be executed
+
+### Setting execution time and date 'cron' style
+
+Setting the command execution time and date looks like setting up a linux cron job.
+
+![Command setup](pics/command_set.png "Command Setup")
+
+Here are some examples:
+
+    minutes        0
+    hours          9
+    day of month   * (every day of month)
+    month          * (every month)
+    day of week    * (every day of week)       -> at 09:00 every day 
+    
+    minutes        0
+    hours          9
+    day of month   * (every day of month)
+    month          * (every month)
+    day of week    Sunday                      -> at 09:00 every Sunday 
+
+    minutes        0
+    hours          9
+    day of month   1
+    month          *
+    day of week    * (every day of week)       -> at 09:00 every 1 st day of month 
 
 ### Building the binaries and flashing ESP8266
 
 Required:
 
-+ [Espressif NON-OS SDK] (<https://github.com/espressif/ESP8266_NONOS_SDK)> in a separate repository.
-+ [esp-open-sdk toolchain] (<https://github.com/pfalcon/esp-open-sdk)> in a separate repository; build the bare Xtensa toolchain and leave ESP8266 SDK separate using:
+- [Espressif NON-OS SDK] (<https://github.com/espressif/ESP8266_NONOS_SDK)> in a separate repository.
+- [esp-open-sdk toolchain] (<https://github.com/pfalcon/esp-open-sdk)> in a separate repository; build the bare Xtensa toolchain and leave ESP8266 SDK separate using:
 
       make STANDALONE=n
 
 Build steps (linux)
 
-+ Clone the repository.
-+ Customize build variables according to your ESP8266 module and environment:
+- Clone the repository.
+- Customize build variables according to your ESP8266 module and environment:
 
-      cd <your path>/espbot_2.0
+      cd <your path>/smart_timer
       ./gen_env.sh
 
       this will generate a env.sh file
@@ -81,7 +115,7 @@ Build steps (linux)
       export FLASH_OPTIONS=" write_flash -fm dio -fs 32m-c1 -ff 40m "
       export FLASH_INIT="0x3FB000 <your path to ESP8266_NONOS_SDK>/bin/blank.bin 0x3FC000 <your path to ESP8266_NONOS_SDK>/bin/esp_init_data_default_v08.bin 0x3FE000 <your path to ESP8266_NONOS_SDK>/blank.bin"
 
-+ Building (commands available as tasks in case you are using Visual Studio)
+- Building (commands available as tasks in case you are using Visual Studio)
   
   Clean project
   
@@ -103,7 +137,13 @@ Build steps (linux)
   
       source ${workspaceFolder}/env.sh && make -e APP=1 all && make -e APP=2 all
 
-+ Flashing ESP8266 using esptool.py (checkout your distribution packages or [github repository](https://github.com/espressif/esptool)) (commands available as tasks in case you are using Visual Studio)
+## Setup the device
+
+### Flashing
+
+(flash commands are also available as VS tasks)
+
+Flashing ESP8266 using esptool.py (checkout your distribution packages or [github repository](https://github.com/espressif/esptool)) (commands available as tasks in case you are using Visual Studio)
   
   Erase flash
   
@@ -129,83 +169,33 @@ Build steps (linux)
   
       source ${workspaceFolder}/env.sh && make -e APP=2 flash
 
-### FOTA example
+### Wifi setup
 
-Here is an example on how to use espbot FOTA using a [docker](https://www.docker.com/community-edition#/download) container as http server (thank you docker for existing).
+- wifi connection: without configuration the ESP device will work as a Wifi AP with SSID=ESPBOT-chip_id and password=espbot123456
 
-    Start an http server using docker:
-    $ docker run -d --name espbot-http-upgrade -p 80:80 -v <your espbot directory>/bin/upgrade/www:/usr/share/nginx/html:ro nginx:alpine
-
-    Configure and command espbot with following curl examples or use the REST apis with any swagger viewer.
-      
-    Configure espbot:
-
-    curl --location --request POST 'http://{{device_host}}/api/ota/cfg' \
-      --header 'Content-Type: application/json' \
+      curl --location --request POST 'http://{{host}}/api/wifi/cfg' \
       --data-raw '{
-          "host": "{{your host IP}}",
-          "port": 80,
-          "path": "/",
-          "check_version": "false",
-          "reboot_on_completion": "true"
-      }'
-      
-    Start upgrade:
+          "station_ssid": "your_Wifi_SSID",
+          "station_pwd": "your_Wifi_password"
+      }
+  this will make the device stop working as AP and connect to your Wifi AP
 
-    curl --location --request POST 'http://{{device_host}}/api/ota' \
-      --data-raw ''
+### Uploading web server files
 
-## Integrating
+Use the [espUploadFile](https://github.com/quackmore/esp_utils) bash script to upload files to the ESP8266 device
 
-To integrate espbot in your project as a library checkout src/app example source files for how to build your app and use the following files:
+- cd to web directory and upload each file to the device running the following command
+- espUploadFile filename 'your device IP address'
 
-+ lib/libespbot.a
-+ lib/libdriver.a
-+ lib/libspiffs.a
+### Minimum device configuration
 
-To import the library source files use the following files:
+Smart Timer requires following minimum configuration (using the web interface)
 
-+ src/driver
-+ src/espbot
-+ src/spiffs
-
-Espot include files are:
-
-+ driver_hw_timer.h
-+ driver_uart_register.h
-+ driver_uart.h
-+ esp8266_io.h
-+ espbot_config.hpp
-+ espbot_cron.hpp
-+ espbot_diagnostic.hpp
-+ espbot_event_codes.h
-+ espbot_global.hpp
-+ espbot_gpio.hpp
-+ espbot_http_routes.hpp
-+ espbot_http.hpp
-+ espbot_json.hpp
-+ espbot_list.hpp
-+ espbot_mdns.hpp
-+ espbot_mem_macros.h
-+ espbot_mem_mon.h
-+ espbot_ota.hpp
-+ espbot_profiler.hpp
-+ espbot_queue.hpp
-+ espbot_rtc_mem_map.h
-+ espbot_timedate.hpp
-+ espbot_utils.hpp
-+ espbot_webclient.hpp
-+ espbot_webserver.hpp
-+ espbot_wifi.hpp
-+ espbot.hpp
-+ spiffs_config.h
-+ spiffs_esp8266.hpp
-+ spiffs_flash_functions.hpp
-+ spiffs_nucleus.h
-+ spiffs.h
+- cron 'enabled'
+- SNTP 'enabled' (for time precision)
 
 ## License
 
-Espbot_2.0 comes with a [BEER-WARE] license.
+The app comes with a [BEER-WARE] license.
 
 Enjoy.
