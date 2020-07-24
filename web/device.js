@@ -47,6 +47,7 @@ function update_device_info() {
     $("#app_version").val(data.app_version);
     $("#dev_name").val(data.device_name);
     $("#espbot_version").val(data.espbot_version);
+    $("#api_version").val(data.api_version);
     $("#library_version").val(data.library_version);
     $("#chip_id").val(data.chip_id);
     $("#sdk_version").val(data.sdk_version);
@@ -542,7 +543,7 @@ $('#ota_start').on('click', function () {
     url: esp8266.url + '/api/ota',
     dataType: 'json',
     crossDomain: esp8266.cors,
-    timeout: 15000,
+    timeout: 18000,
     success: function (data) {
       setTimeout(function () {
         $('#awaiting').modal('hide');

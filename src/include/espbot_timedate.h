@@ -6,15 +6,24 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
-#ifndef __LIBRARY_EVENT_CODES_H__
-#define __LIBRARY_EVENT_CODES_H__
 
-#define DHT_HEAP_EXHAUSTED 0x1000
-#define DHT_READING_TIMEOUT 0x1001
-#define DHT_READING_CHECKSUM_ERR 0x1002
-#define DHT_READ_HEAP_EXHAUSTED 0x1003
+#ifndef __TIMEDATE_H__
+#define __TIMEDATE_H__
 
-#define MAX6675_THERMOCOUPLE_DISCONNECTED 0x1004
-#define MAX6675_HEAP_EXHAUSTED 0x1005
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include "c_types.h"
+#ifdef __cplusplus
+}
+#endif
+
+// declared public cause it's being stored into RTC memory
+struct espbot_time
+{
+    uint32 sntp_time;
+    uint32 rtc_time;
+};
 
 #endif

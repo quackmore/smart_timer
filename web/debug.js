@@ -56,6 +56,15 @@ function esp_get_last_rst(success_cb) {
   });
 }
 
+function formatStackDump(data) {
+  var stackDump = "";
+  for (var idx = 0; idx < data.spDump.length; idx++) {
+    stackDump += data.spDump[idx];
+    stackDump += '\r\n';
+  }
+  return stackDump;
+}
+
 function update_last_rst() {
   esp_get_last_rst(function (data) {
     $("#last_rst_date").val(data.date);
@@ -66,6 +75,8 @@ function update_last_rst() {
     $("#last_rst_epc3").val(data.epc3);
     $("#last_rst_evcvaddr").val(data.evcvaddr);
     $("#last_rst_depc").val(data.depc);
+    $("#last_rst_sp").val(data.sp);
+    $("#last_rst_spdump").val(formatStackDump(data));
   });
 }
 

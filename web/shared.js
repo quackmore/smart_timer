@@ -1,9 +1,9 @@
 // shared.js
 const esp8266 = {
-  "url": "",
-  "cors": false
-  // "url": "http://192.168.1.187",
-  // "cors": true
+  // "url": "",
+  // "cors": false
+  "url": "http://192.168.1.187",
+  "cors": true
 };
 
 function ajax_error(xhr, status, msg) {
