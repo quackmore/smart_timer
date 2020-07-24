@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   title: Smart Timer APIs
-  version: 1.0.0
+  version: 1.1.0
   description: >
     These APIs are for reading, setting and controlling Smart Timer APP. 
 
@@ -1547,6 +1547,7 @@ components:
       - app_name
       - app_version
       - espbot_version
+      - api_version
       - library_version
       - sdk_version
       - boot_version
@@ -1576,6 +1577,11 @@ components:
           pattern: '[ -~]{1,63}'
           minLength: 1
           maxLength: 64
+        api_version:
+          type: string
+          pattern: '[ -~]{1,10}'
+          minLength: 1
+          maxLength: 10
         library_version:
           type: string
           pattern: '[ -~]{1,63}'
@@ -1835,6 +1841,8 @@ components:
       - epc3
       - evcvaddr
       - depc
+      - sp
+      - spDump
       properties:
         date:
           type: string
@@ -1843,49 +1851,62 @@ components:
           minLength: 23
           maxLength: 24
         reason:
-          type: integer
+          type: string
           description: the reason for last reboot
-          format: int32
-          default: 6
-          minimum: 0    
-          maximum: 6
+          pattern: "[0-6]"
+          minLength: 1
+          maxLength: 1
         exccause:
-          type: integer
-          description: t
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 0
+          type: string
+          description: exception type
+          pattern: '[0-9a-fA-F]{1,2}'
+          minLength: 1
+          maxLength: 2
         epc1:
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 4194304
+          type: string
+          description: program counter
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
         epc2:
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 0
+          type: string
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
         epc3:
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 0
+          type: string
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
         evcvaddr:
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 0
+          type: string
+          description: exception address
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
         depc:
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0    
-          maximum: 0
+          type: string
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
+        sp:
+          type: string
+          description: stack pointer
+          pattern: '[0-9a-fA-F]{1,8}'
+          minLength: 1
+          maxLength: 8
+        spDump:
+          type: array
+          description: stack dump, only addresses that possibly are
+                       return addresses are reported
+          minItems: 19
+          maxItems: 19
+          items:
+            type: string
+            description: address
+            pattern: '[0-9a-fA-F]{1,8}'
+            minLength: 1
+            maxLength: 8
       additionalProperties: false
     mdnsStatus:
       type: object
