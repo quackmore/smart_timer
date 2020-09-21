@@ -40,12 +40,6 @@ void app_init_before_wifi(void)
     app_relay_init();
     app_command_init();
     // cron_add_job(CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, CRON_STAR, NULL, NULL);
-}
-
-os_timer_t thermostat_start_timer;
-
-void thermostat_start(void)
-{
     cron_sync();
 }
 
@@ -55,9 +49,6 @@ void app_init_after_wifi(void)
     if (first_time)
     {
         first_time = false;
-        os_timer_disarm(&thermostat_start_timer);
-        os_timer_setfn(&thermostat_start_timer, (os_timer_func_t *)thermostat_start, NULL);
-        os_timer_arm(&thermostat_start_timer, 2000, 0);
     }
 }
 

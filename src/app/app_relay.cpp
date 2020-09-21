@@ -45,6 +45,7 @@ void open_relay(struct relay *relay_p)
 
 void pulse_close_relay(struct relay *relay_p)
 {
+  os_timer_disarm(&relay_p->timer);
   os_timer_setfn(&relay_p->timer, (ETSTimerFunc *)open_relay, (void *)relay_p);
   os_timer_arm(&relay_p->timer, relay_p->pulse, 0);
   close_relay(relay_p);
@@ -52,6 +53,7 @@ void pulse_close_relay(struct relay *relay_p)
 
 void pulse_open_relay(struct relay *relay_p)
 {
+  os_timer_disarm(&relay_p->timer);
   os_timer_setfn(&relay_p->timer, (ETSTimerFunc *)close_relay, (void *)relay_p);
   os_timer_arm(&relay_p->timer, relay_p->pulse, 0);
   open_relay(relay_p);
