@@ -1,110 +1,75 @@
-// command.js
-
-// spinner while awaiting for page load
+// home.js
 $(document).ready(function () {
-  setTimeout(function () {
-    $('#awaiting').modal('hide');
-  }, 1000);
-  update_page();
+  esp_get_command_list().then(function () {
+    hide_spinner(500);
+  });
 });
 
-function update_page() {
-  update_commands_list();
-}
-
 $('#commands_refresh').on('click', function () {
-  $('#awaiting').modal('show');
-  setTimeout(function () {
-    $('#awaiting').modal('hide');
-  }, 1000);
-  update_commands_list();
+  show_spinner().then(function () {
+    esp_get_command_list().then(function () {
+      hide_spinner(500);
+    })
+  })
 });
 
 // Commands
 
-function esp_get_command_list(success_cb) {
-  $.ajax({
+function esp_get_command_list() {
+  return esp_query({
     type: 'GET',
-    url: esp8266.url + '/api/command',
+    url: '/api/command',
     dataType: 'json',
-    crossDomain: esp8266.cors,
-    timeout: 5000,
-    success: function (data) {
-      success_cb(data);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+    success: update_commands_list,
+    error: query_err
   });
 }
 
-function esp_get_command_idx(ii, success_cb) {
-  $.ajax({
+function esp_get_command_idx(ii) {
+  return esp_query({
     type: 'GET',
-    url: esp8266.url + '/api/command/' + ii,
+    url: '/api/command/' + ii,
     dataType: 'json',
-    crossDomain: esp8266.cors,
-    timeout: 3000,
-    success: function (data) {
-      success_cb(data);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+    success: update_command_idx,
+    error: query_err
   });
 }
 
 function esp_put_command_idx(ii) {
-  $.ajax({
+  return esp_query({
     type: 'PUT',
-    url: esp8266.url + '/api/command/' + ii,
+    url: '/api/command/' + ii,
     dataType: 'json',
     contentType: 'application/json',
     data: jsonify_command(),
-    crossDomain: esp8266.cors,
-    timeout: 5000,
-    success: function () {
-      $('#commandModal').modal('hide');
-      update_commands_list();
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+    timeout: 8000,
+    success: null,
+    error: query_err
   });
 }
 
 function esp_post_command() {
-  $.ajax({
+  return esp_query({
     type: 'POST',
-    url: esp8266.url + '/api/command',
+    url: '/api/command',
     dataType: 'json',
     contentType: 'application/json',
     data: jsonify_command(),
-    crossDomain: esp8266.cors,
-    timeout: 5000,
-    success: function () {
-      $('#commandModal').modal('hide');
-      update_commands_list();
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+    timeout: 8000,
+    success: null,
+    error: query_err
   });
 }
 
 function esp_del_command_idx(ii) {
-  $.ajax({
+  return esp_query({
     type: 'DELETE',
-    url: esp8266.url + '/api/command/' + ii,
-    crossDomain: esp8266.cors,
-    timeout: 5000,
-    success: function () {
-      update_commands_list();
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-      update_commands_list();
-    }
+    url: '/api/command/' + ii,
+    dataType: 'json',
+    contentType: 'application/json',
+    timeout: 8000,
+    success: null,
+    error: query_err
   });
 }
 
@@ -271,107 +236,109 @@ function command_when(min, hour, dom, month, dow) {
   }
 }
 
-function update_commands_list() {
-  esp_get_command_list(function (data) {
-    var table_data = [];
-    for (var ii = 0; ii < data.commands.length; ii++) {
-      var obj = new Object();
-      obj.en = command_enabled(data.commands[ii].enabled);
-      obj.desc = data.commands[ii].name;
-      obj.type = command_type(data.commands[ii].type);
-      obj.contact = 'D' + data.commands[ii].relay_id;
-      obj.duration = command_duration(data.commands[ii].type, data.commands[ii].duration);
-      obj.when = command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow);
-      obj.actions = '<button class="btn btn-sm" onclick="modify_command(' +
-        data.commands[ii].id +
-        ')"><i class="fa fa-pencil-square-o"></i></button><button class="btn btn-sm" onclick="delete_command(' +
-        data.commands[ii].id +
-        ')"><i class="fa fa-trash-o"></i></button>';
-      table_data.push(obj);
-    }
-    $("#commands_table").bootstrapTable({ data: table_data });
-    $("#commands_table").bootstrapTable('load', table_data);
-  });
+function update_commands_list(data) {
+  var table_data = [];
+  for (var ii = 0; ii < data.commands.length; ii++) {
+    var obj = new Object();
+    obj.en = command_enabled(data.commands[ii].enabled);
+    obj.desc = data.commands[ii].name;
+    obj.type = command_type(data.commands[ii].type);
+    obj.contact = 'D' + data.commands[ii].relay_id;
+    obj.duration = command_duration(data.commands[ii].type, data.commands[ii].duration);
+    obj.when = command_when(data.commands[ii].min, data.commands[ii].hour, data.commands[ii].dom, data.commands[ii].month, data.commands[ii].dow);
+    obj.actions = '<button class="btn btn-sm" onclick="modify_command(' +
+      data.commands[ii].id +
+      ')"><i class="fa fa-pencil-square-o"></i></button><button class="btn btn-sm" onclick="delete_command(' +
+      data.commands[ii].id +
+      ')"><i class="fa fa-trash-o"></i></button>';
+    table_data.push(obj);
+  }
+  $("#commands_table").bootstrapTable({ data: table_data });
+  $("#commands_table").bootstrapTable('load', table_data);
 }
 
 var current_id;
 
-function update_command_idx(idx) {
-  esp_get_command_idx(idx, function (data) {
-    $('#command_enabled').val(data.enabled);
-    $('#command_name').val(data.name);
-    $('#command_type').val(data.type);
-    $('#command_duration').val(data.duration);
-    if (($('#command_type').val() == 1) || ($('#command_type').val() == 2))
-      $('#command_duration_group').addClass('d-none');
-    else
-      $('#command_duration_group').removeClass('d-none');
-    $('#command_relay_id').val(data.relay_id);
-    if (data.min == -1) {
-      $('#command_min').val('');
-      $('#command_min').prop('disabled', true);
-      $('#every_min').prop('checked', true);
-    }
-    else {
-      $('#command_min').val(data.min);
-      $('#command_min').prop('disabled', false);
-      $('#every_min').prop('checked', false);
-    }
-    if (data.hour == -1) {
-      $('#command_hour').val('');
-      $('#command_hour').prop('disabled', true);
-      $('#every_hour').prop('checked', true);
-    }
-    else {
-      $('#command_hour').val(data.hour);
-      $('#command_hour').prop('disabled', false);
-      $('#every_hour').prop('checked', false);
-    }
-    if (data.dom == 0) {
-      $('#command_dom').val('');
-      $('#command_dom').prop('disabled', true);
-      $('#every_dom').prop('checked', true);
-    }
-    else {
-      $('#command_dom').val(data.dom);
-      $('#command_dom').prop('disabled', false);
-      $('#every_dom').prop('checked', false);
-    }
-    if (data.month == 0) {
-      $('#command_month').val('');
-      $('#command_month').prop('disabled', true);
-      $('#every_month').prop('checked', true);
-    }
-    else {
-      $('#command_month').val(data.month);
-      $('#command_month').prop('disabled', false);
-      $('#every_month').prop('checked', false);
-    }
-    if (data.dow == 0) {
-      $('#command_dow').val('');
-      $('#command_dow').prop('disabled', true);
-      $('#every_dow').prop('checked', true);
-    }
-    else {
-      $('#command_dow').val(data.dow);
-      $('#command_dow').prop('disabled', false);
-      $('#every_dow').prop('checked', false);
-    }
-  });
+function update_command_idx(data) {
+  $('#command_enabled').val(data.enabled);
+  $('#command_name').val(data.name);
+  $('#command_type').val(data.type);
+  $('#command_duration').val(data.duration);
+  if (($('#command_type').val() == 1) || ($('#command_type').val() == 2))
+    $('#command_duration_group').addClass('d-none');
+  else
+    $('#command_duration_group').removeClass('d-none');
+  $('#command_relay_id').val(data.relay_id);
+  if (data.min == -1) {
+    $('#command_min').val('');
+    $('#command_min').prop('disabled', true);
+    $('#every_min').prop('checked', true);
+  }
+  else {
+    $('#command_min').val(data.min);
+    $('#command_min').prop('disabled', false);
+    $('#every_min').prop('checked', false);
+  }
+  if (data.hour == -1) {
+    $('#command_hour').val('');
+    $('#command_hour').prop('disabled', true);
+    $('#every_hour').prop('checked', true);
+  }
+  else {
+    $('#command_hour').val(data.hour);
+    $('#command_hour').prop('disabled', false);
+    $('#every_hour').prop('checked', false);
+  }
+  if (data.dom == 0) {
+    $('#command_dom').val('');
+    $('#command_dom').prop('disabled', true);
+    $('#every_dom').prop('checked', true);
+  }
+  else {
+    $('#command_dom').val(data.dom);
+    $('#command_dom').prop('disabled', false);
+    $('#every_dom').prop('checked', false);
+  }
+  if (data.month == 0) {
+    $('#command_month').val('');
+    $('#command_month').prop('disabled', true);
+    $('#every_month').prop('checked', true);
+  }
+  else {
+    $('#command_month').val(data.month);
+    $('#command_month').prop('disabled', false);
+    $('#every_month').prop('checked', false);
+  }
+  if (data.dow == 0) {
+    $('#command_dow').val('');
+    $('#command_dow').prop('disabled', true);
+    $('#every_dow').prop('checked', true);
+  }
+  else {
+    $('#command_dow').val(data.dow);
+    $('#command_dow').prop('disabled', false);
+    $('#every_dow').prop('checked', false);
+  }
 }
 
 function modify_command(idx) {
   current_id = idx;
-  $('#commandModalTitle').text('Command ' + idx);
-  update_command_idx(idx);
+  $('#commandModalTitle').text('Command ' + current_id);
   $('#commandModalReset').prop('disabled', false);
-  $('#commandModal').modal('show');
+  esp_get_command_idx(current_id).then(function () {
+    $('#commandModal').modal('show');
+  });
 };
 
 function delete_command(idx) {
-  if (confirm("Deleted commands cannot be recovered.\nConfirm delete...")) {
-    esp_del_command_idx(idx);
-  }
+  if (confirm("Deleted commands cannot be recovered.\nConfirm delete..."))
+    show_spinner().then(function () {
+      esp_del_command_idx(idx).then(function () {
+        esp_get_command_list().then(function () {
+          hide_spinner(500);
+        })
+      })
+    })
 };
 
 $('#add_command').on('click', function () {
@@ -401,14 +368,28 @@ $('#add_command').on('click', function () {
 });
 
 $('#commandModalReset').on('click', function () {
-  update_command_idx(current_id);
+  esp_get_command_idx(current_id);
 });
 
 $('#commandModalSave').on('click', function () {
   if (current_id < 0)
-    esp_post_command();
+    esp_post_command().then(function () {
+      $('#commandModal').modal('hide');
+      show_spinner().then(function () {
+        esp_get_command_list().then(function () {
+          hide_spinner(500);
+        })
+      });
+    });
   else
-    esp_put_command_idx(current_id);
+    esp_put_command_idx(current_id).then(function () {
+      $('#commandModal').modal('hide');
+      show_spinner().then(function () {
+        esp_get_command_list().then(function () {
+          hide_spinner(500);
+        })
+      });
+    });
 });
 
 $('#command_name').on('change', function () {

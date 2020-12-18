@@ -5,6 +5,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
   <link rel="shortcut icon" type="image/png" href="https://img.icons8.com/ios/50/000000/timer.png" />
   <meta name="description" content="">
   <meta name="author" content="">
@@ -16,209 +17,10 @@
     integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.17.0/dist/bootstrap-table.min.css">
 
   <!-- Custom styles for this template -->
   <link href="sidebar.css" rel="stylesheet">
 
-</head>
-
-<body>
-
-  <div class="d-flex" id="wrapper">
-
-    <!-- Sidebar -->
-    <div class="border-right side  bg-sidebar" id="sidebar-wrapper">
-      <div class="sidebar-heading">SMART TIMER</div>
-      <div class="list-group list-group-flush border-right">
-        <a href="index.html" class="list-group-item list-group-item-action bg-sidebar">Command list</a>
-        <a href="relay.html" class="list-group-item list-group-item-action bg-sidebar">Contact list</a>
-        <a href="events_journal.html" class="list-group-item list-group-item-action bg-sidebar">Events journal</a>
-        <a href="device.html" class="list-group-item list-group-item-action bg-sidebar">Device settings</a>
-        <a href="gpio.html" class="list-group-item list-group-item-action bg-sidebar">Device GPIO</a>
-        <a href="debug.html" class="list-group-item list-group-item-action bg-sidebar">Device Debug</a>
-        <a href="info.html" class="list-group-item list-group-item-action bg-sidebar">Info & Credits</a>
-      </div>
-    </div>
-    <!-- /#sidebar-wrapper -->
-
-    <!-- Page Content ################################################################################-->
-    <div id="page-content-wrapper">
-
-      <nav class="navbar navbar-expand-lg navbar-dark border-bottom" id=content-navbar>
-        <span id="content-title">Command list</span>
-        <button class="btn ml-auto" id="menu-toggle">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </nav>
-
-      <div class="container-fluid">
-        <div>
-          <p></p>
-        </div>
-        <div class="card border-info">
-          <div class="card-body">
-            <div class="card-title">
-              <div class="row no-gutters">
-                <h5 class="card-title my-auto"><i class="fa fa-list"></i> Command list</h5>
-                <div class="btn-toolbar my-auto ml-auto" role="toolbar" aria-label="Toolbar with button groups">
-                  <button class="btn my-auto ml-auto" id="add_command">
-                    <i class="fa fa-plus-square-o"></i>
-                  </button>
-                  <button class="btn my-auto ml-auto" id="commands_refresh">
-                    <i class="fa fa-refresh"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="table-responsive text-nowrap table-sm small table-bordered vh-50">
-              <table class="table table-striped" id="commands_table">
-                <thead>
-                  <tr>
-                    <th data-field="en" data-sortable="true">En.</th>
-                    <th data-field="desc" data-sortable="true">Description</th>
-                    <th data-field="type" data-sortable="true">Type</th>
-                    <th data-field="contact" data-sortable="true">Contact</th>
-                    <th data-field="duration" data-sortable="true">Duration [ms]</th>
-                    <th data-field="when" data-sortable="true">When</th>
-                    <th data-field="actions">Actions</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End Of Page Content #########################################################################-->
-    <!-- Modal -->
-    <div class="modal fade" id="commandModal" tabindex="-1" role="dialog" aria-labelledby="commandModalTitle"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="commandModalTitle">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group row no-gutters">
-              <label for="command_enabled" class="col-form-label col-5 my-auto">Enabled</label>
-              <select id="command_enabled" class="form-control-sm col-7 ml-auto my-auto">
-                <option value="0"><span class="sr-only">disabled</span></option>
-                <option value="1" selected><span class="sr-only">enabled</span></option>
-              </select>
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_name" class="col-form-label col-5 my-auto">Description</label>
-              <input type="text" class="form-control-sm col-7 ml-auto my-auto" id="command_name">
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_type" class="col-form-label col-5 my-auto">Type</label>
-              <select id="command_type" class="form-control-sm col-7 ml-auto my-auto">
-                <option value="1"><span class="sr-only">switch OPEN</span></option>
-                <option value="2" selected><span class="sr-only">switch CLOSE</span></option>
-                <option value="3"><span class="sr-only">pulse OPEN</span></option>
-                <option value="4"><span class="sr-only">pulse CLOSE</span></option>
-              </select>
-            </div>
-            <div class="form-group row no-gutters" id="command_duration_group">
-              <label for="command_duration" class="col-form-label col-5 my-auto">Duration</label>
-              <input type="number" value="60000" min="10" max="4294967295" step="1"
-                class="form-control-sm col-7 ml-auto my-auto text-monospace" id="command_duration">
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_relay_id" class="col-form-label col-5 my-auto">Contact ID</label>
-              <input type="number" value="1" min="1" max="8" step="1"
-                class="form-control-sm col-7 ml-auto my-auto text-monospace" id="command_relay_id">
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_min" class="col-form-label col-5 my-auto">Minutes</label>
-              <div class="form-group row col-7 my-auto no-gutters">
-                <input type="number" value="0" min="0" max="59" step="1" class="form-control-sm col-3 my-auto"
-                  id="command_min">
-                <input type="checkbox" class="form-control-sm mx-auto my-auto" id="every_min">
-                <input type="text" class="form-control-sm col-7 my-auto" value="every minute" disabled>
-              </div>
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_hour" class="col-form-label col-5 my-auto">Hours</label>
-              <div class="form-group row col-7 my-auto no-gutters">
-                <input type="number" value="0" min="0" max="23" step="1" class="form-control-sm col-3 my-auto"
-                  id="command_hour">
-                <input type="checkbox" class="form-control-sm mx-auto my-auto" id="every_hour">
-                <input type="text" class="form-control-sm col-7 my-auto" value="every hour" disabled>
-              </div>
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_dom" class="col-form-label col-5 my-auto">Day of month</label>
-              <div class="form-group row col-7 my-auto no-gutters">
-                <input type="number" value="1" min="1" max="31" step="1" class="form-control-sm col-3 my-auto"
-                  id="command_dom">
-                <input type="checkbox" class="form-control-sm mx-auto my-auto" id="every_dom">
-                <input type="text" class="form-control-sm col-7 my-auto" value="every day of month" disabled>
-              </div>
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_month" class="col-form-label col-5 my-auto">Month</label>
-              <div class="form-group row col-7 my-auto no-gutters">
-                <select id="command_month" class="form-control-sm col-3 ml-0 my-auto">
-                  <option value="1" selected><span class="sr-only">Jan</span></option>
-                  <option value="2"><span class="sr-only">Feb</span></option>
-                  <option value="3"><span class="sr-only">Mar</span></option>
-                  <option value="4"><span class="sr-only">Apr</span></option>
-                  <option value="5"><span class="sr-only">May</span></option>
-                  <option value="6"><span class="sr-only">Jun</span></option>
-                  <option value="7"><span class="sr-only">Jul</span></option>
-                  <option value="8"><span class="sr-only">Aug</span></option>
-                  <option value="9"><span class="sr-only">Sep</span></option>
-                  <option value="10"><span class="sr-only">Oct</span></option>
-                  <option value="11"><span class="sr-only">Nov</span></option>
-                  <option value="12"><span class="sr-only">Dec</span></option>
-                </select>
-                <input type="checkbox" class="form-control-sm mx-auto my-auto" id="every_month">
-                <input type="text" class="form-control-sm col-7 my-auto" value="every month" disabled>
-              </div>
-            </div>
-            <div class="form-group row no-gutters">
-              <label for="command_dow" class="col-form-label col-5 my-auto">Day of week</label>
-              <div class="form-group row col-7 my-auto no-gutters">
-                <select id="command_dow" class="form-control-sm col-3 ml-0 my-auto">
-                  <option value="1" selected><span class="sr-only">Mon</span></option>
-                  <option value="2"><span class="sr-only">Tue</span></option>
-                  <option value="3"><span class="sr-only">Wed</span></option>
-                  <option value="4"><span class="sr-only">Thu</span></option>
-                  <option value="5"><span class="sr-only">Fri</span></option>
-                  <option value="6"><span class="sr-only">Sat</span></option>
-                  <option value="7"><span class="sr-only">Sun</span></option>
-                </select>
-                <input type="checkbox" class="form-control-sm mx-auto my-auto" id="every_dow">
-                <input type="text" class="form-control-sm col-7 my-auto" value="every day of week" disabled>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="commandModalReset">Reset</button>
-              <button type="button" class="btn btn-primary" id="commandModalSave">Save</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End of Modal -->
-
-  </div>
-  <!-- /#wrapper -->
-  <!-- #spinner while awaiting for page load -->
-  <div class="modal fade" id="awaiting" data-backdrop="static" data-keyboard="false" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0" style="background-color: transparent;">
-        <span class="spinner-border mx-auto" role="status" style="width: 3rem; height: 3rem;"></span>
-      </div>
-    </div>
-  </div>
-  <!-- /#spinner while awaiting for page load -->
   <!-- Bootstrap core JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS, then custom script -->
   <!-- don't use slim if you need ajax -->
@@ -230,19 +32,83 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/bootstrap-table@1.17.0/dist/bootstrap-table.min.js"></script>
-  <script src="shared.js"></script>
-  <script src="command.js"></script>
-  <script type="text/javascript">
-    $('#awaiting').modal('show');
-  </script>
-  <!-- Menu Toggle Script -->
-  <script>
-    $("#menu-toggle").click(function (e) {
-      e.preventDefault();
-      $("#wrapper").toggleClass("toggled");
-    });
-  </script>
+
+</head>
+
+<body>
+
+  <!-- Body content wrapper -->
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="border-right side  bg-sidebar" id="sidebar-wrapper">
+      <div class="sidebar-heading">ESP SMART TIMER</div>
+      <div class="list-group list-group-flush border-right">
+        <a href="javascript:goto('home')" class="list-group-item list-group-item-action bg-sidebar">Home</a>
+        <a href="javascript:goto('relay')" class="list-group-item list-group-item-action bg-sidebar">Contact list</a>
+        <a href="javascript:goto('events_journal')" class="list-group-item list-group-item-action bg-sidebar">Events journal</a>
+        <a href="javascript:goto('device')" class="list-group-item list-group-item-action bg-sidebar">Device settings</a>
+        <a href="javascript:goto('gpio')" class="list-group-item list-group-item-action bg-sidebar">Device GPIO</a>
+        <a href="javascript:goto('debug')" class="list-group-item list-group-item-action bg-sidebar">Device Debug</a>
+        <a href="javascript:goto('info')" class="list-group-item list-group-item-action bg-sidebar">Info & Credits</a>
+      </div>
+    </div>
+    <!-- End of sidebar -->
+
+    <!-- Spinner for page load (when required) -->
+    <div class="modal fade" id="awaiting" data-backdrop="static" data-keyboard="false" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="background-color: transparent;">
+          <span class="spinner-border mx-auto" role="status" style="width: 3rem; height: 3rem;"></span>
+        </div>
+      </div>
+    </div>
+    <!-- End of spinner -->
+
+    <!-- Page content including navbar-->
+    <div id="page-content-wrapper">
+
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark border-bottom" id=content-navbar>
+        <span id="content-title">Smart Timer</span>
+        <button class="btn ml-auto" id="menu-toggle">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </nav>
+
+      <script>
+        $("#menu-toggle").click(function (e) {
+          e.preventDefault();
+          $("#wrapper").toggleClass("toggled");
+        });
+      </script>
+      <!-- End of navbar -->
+
+      <div class="container-fluid">
+        <!-- Custom page content including reference to custom scripts -->
+        <div id="page-content">
+          <script>
+            $('#awaiting').modal('show');
+            $("#page-content").load("home.html", function (responseText, textStatus, xhr) {
+              if (textStatus != "success") {
+                alert("Request " + textStatus);
+                setTimeout(function () {
+                  $('#awaiting').modal('hide');
+                }, 1000);
+              }
+            });
+          </script>
+        </div>
+        <!-- End of custom page content -->
+      </div>
+
+    </div>
+    <!-- End of page content -->
+
+  </div>
+  <!-- End of body content wrapper -->
+  <script src="sidebar.js"></script>
+
 </body>
 
 </html>

@@ -1,117 +1,124 @@
 // gpio.js
 
-// spinner while awaiting for page load
 $(document).ready(function () {
-  setTimeout(function () {
-    $('#awaiting').modal('hide');
-  }, 1000);
-  update_page();
+  update_gpio_list();
 });
 
-function update_page() {
-  counter = 1;
-  update_gpio_list();
-}
-
-
-// Files
-
-function esp_get_gpio_cfg(ii, success_cb) {
-  $.ajax({
-    type: 'GET',
-    url: esp8266.url + '/api/gpio/cfg/' + ii,
-    dataType: 'json',
-    crossDomain: esp8266.cors,
-    timeout: 2000,
-    success: function (data) {
-      success_cb(data);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+function update_gpio_list() {
+  show_spinner().then(function (data) {
+    update_gpio(1).then(function () {
+      update_gpio(2).then(function () {
+        update_gpio(3).then(function () {
+          update_gpio(4).then(function () {
+            update_gpio(5).then(function () {
+              update_gpio(6).then(function () {
+                update_gpio(7).then(function () {
+                  update_gpio(8).then(function () {
+                    hide_spinner(500);
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
   });
 }
 
-function esp_get_gpio_level(ii, success_cb) {
-  $.ajax({
+function esp_get_gpio_cfg(ii) {
+  return esp_query({
     type: 'GET',
-    url: esp8266.url + '/api/gpio/' + ii,
+    url: '/api/gpio/cfg/' + ii,
     dataType: 'json',
-    crossDomain: esp8266.cors,
-    timeout: 2000,
-    success: function (data) {
-      success_cb(ii, data.gpio_level);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
+    success: null,
+    error: query_err
   });
 }
 
-function update_gpio_level(idx, value) {
+function esp_get_gpio_level(ii) {
+  return esp_query({
+    type: 'GET',
+    url: '/api/gpio/' + ii,
+    dataType: 'json',
+    success: null,
+    error: query_err
+  });
+}
+
+function update_gpio_level(idx, data) {
   var gpio_level_id = "#d" + idx + "_value";
-  if (value == "low")
+  if (data.gpio_level == "low")
     $(gpio_level_id).prop('checked', true);
   else
     $(gpio_level_id).prop('checked', false);
 }
 
 function update_gpio(idx) {
-  esp_get_gpio_cfg(idx, function (data) {
+  return new Promise(function (resolve, reject) {
     var gpio_cfg_id = "#d" + idx + "_cfg";
     var gpio_level_id = "#d" + idx + "_value";
-    switch (data.gpio_type) {
-      case "unprovisioned":
-        $(gpio_cfg_id).val(0);
-        $(gpio_level_id).prop('disabled', true);
-        break;
-      case "input":
-        $(gpio_cfg_id).val(1);
-        esp_get_gpio_level(idx, update_gpio_level);
-        $(gpio_level_id).prop('disabled', true);
-        break;
-      case "output":
-        $(gpio_cfg_id).val(2);
-        esp_get_gpio_level(idx, update_gpio_level);
-        $(gpio_level_id).prop('disabled', false);
-        break;
-    }
+    esp_get_gpio_cfg(idx)
+      .then(function (data) {
+        switch (data.gpio_type) {
+          case "unprovisioned":
+            $(gpio_cfg_id).val(0);
+            $(gpio_level_id).prop('disabled', true);
+            resolve("gpio " + idx + " updated");
+            break;
+          case "input":
+            $(gpio_cfg_id).val(1);
+            $(gpio_level_id).prop('disabled', true);
+            esp_get_gpio_level(idx)
+              .then(function (data) {
+                update_gpio_level(idx, data);
+                resolve("gpio " + idx + " updated");
+              })
+              .catch(function () {
+                reject("gpio not updated");
+              });
+            break;
+          case "output":
+            $(gpio_cfg_id).val(2);
+            $(gpio_level_id).prop('disabled', false);
+            esp_get_gpio_level(idx)
+              .then(function (data) {
+                update_gpio_level(idx, data);
+                resolve("gpio " + idx + " updated");
+              })
+              .catch(function () {
+                reject("gpio not updated");
+              });
+            break;
+          default:
+            reject("gpio not updated");
+        }
+      });
   });
 }
 
-var counter = 1;
-
-function update_gpio_list() {
-  update_gpio(counter);
-  counter++;
-  if (counter > 8)
-    return;
-  setTimeout(function () {
-    update_gpio_list();
-  }, 100);
-}
-
 $('#gpio_refresh').on('click', function () {
-  counter = 1;
   update_gpio_list();
 });
 
 function esp_set_gpio_level(ii, value) {
-  $.ajax({
-    type: 'POST',
-    url: esp8266.url + '/api/gpio/' + ii,
-    dataType: 'json',
-    contentType: 'application/json',
-    data: JSON.stringify({ gpio_level: value }),
-    crossDomain: esp8266.cors,
-    timeout: 2000,
-    success: function (data) {
-      update_gpio(ii);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
-  });
+  show_spinner()
+    .then(function () {
+      return esp_query({
+        type: 'POST',
+        url: '/api/gpio/' + ii,
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({ gpio_level: value }),
+        success: function (data) {
+          update_gpio(ii)
+            .then(function () {
+              hide_spinner(500);
+            });
+        },
+        error: query_err
+      });
+    });
 }
 
 function gpio_set(idx) {
@@ -123,21 +130,23 @@ function gpio_set(idx) {
 }
 
 function esp_set_gpio_cfg(ii, value) {
-  $.ajax({
-    type: 'POST',
-    url: esp8266.url + '/api/gpio/cfg/' + ii,
-    dataType: 'json',
-    contentType: 'application/json',
-    data: JSON.stringify({ gpio_type: value }),
-    crossDomain: esp8266.cors,
-    timeout: 2000,
-    success: function (data) {
-      update_gpio(ii);
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      ajax_error(jqXHR, textStatus, errorThrown);
-    }
-  });
+  show_spinner()
+    .then(function () {
+      return esp_query({
+        type: 'POST',
+        url: '/api/gpio/cfg/' + ii,
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({ gpio_type: value }),
+        success: function () {
+          update_gpio(ii)
+            .then(function () {
+              hide_spinner(500);
+            });
+        },
+        error: query_err
+      });
+    });
 }
 
 function gpio_cfg(idx) {

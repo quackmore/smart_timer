@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   title: Smart Timer APIs
-  version: 1.1.0
+  version: 1.2.0
   description: >
     These APIs are for reading, setting and controlling Smart Timer APP. 
 
@@ -11,6 +11,10 @@ servers:
     description: The generic ESPBOT device
     variables:
       host:
+        enum:
+        - '192.168.10.1'
+        - '192.168.1.176'
+        - '192.168.1.187'
         default: '192.168.10.1'
       port:
         enum:
@@ -24,6 +28,7 @@ servers:
     description: test device
 
 paths:
+# app APIs
   /command:
     get:
       description: Returns the list of the commands on the device.
@@ -192,6 +197,112 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
+  /relay:
+    get:
+      description: Returns the list of the relay on the device.
+      summary: Relay list
+      operationId: getRelayList
+      responses:
+        '200':
+          description: The relay list
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/relayList'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+  /relay/{relay_id}:
+    get:
+      description: Returns the details of the specified relay
+      summary: Find relay
+      operationId: getRelay
+      parameters:
+      - name: relay_id
+        in: path
+        description: The relay id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 8
+        style: simple
+      responses:
+        '200':
+          description: The relay details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/relay'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      description: Update the details of the specified relay
+      summary: Update a relay
+      operationId: updateRelay
+      parameters:
+      - name: relay_id
+        in: path
+        description: The relay id
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 8
+        style: simple
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/relay'
+      responses:
+        '200':
+          description: Relay successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/relay'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+# espbot common APIs
   /cron:
     get:
       description: Returns cron settings (enabled or disabled)
@@ -1135,111 +1246,6 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
-  /relay:
-    get:
-      description: Returns the list of the relay on the device.
-      summary: Relay list
-      operationId: getRelayList
-      responses:
-        '200':
-          description: The relay list
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/relayList'
-        'default':
-          description: Unexpected error
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/error'
-  /relay/{relay_id}:
-    get:
-      description: Returns the details of the specified relay
-      summary: Find relay
-      operationId: getRelay
-      parameters:
-      - name: relay_id
-        in: path
-        description: The relay id
-        required: true
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 8
-        style: simple
-      responses:
-        '200':
-          description: The relay details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/relay'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: Not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        'default':
-          description: Unexpected error
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/error'
-    put:
-      description: Update the details of the specified relay
-      summary: Update a relay
-      operationId: updateRelay
-      parameters:
-      - name: relay_id
-        in: path
-        description: The relay id
-        required: true
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 8
-        style: simple
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/relay'
-      responses:
-        '200':
-          description: Relay successfully modified.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/relay'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: Not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        'default':
-          description: Unexpected error
-          content:
-            application/json:      
-              schema:
-                $ref: '#/components/schemas/error'
   /timedate:
     get:
       description: Returns the device current time and date
@@ -1336,7 +1342,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /wifi:
     get:
-      description: Get wifi inforation (working mode, AP SSID and IP address)
+      description: Get wifi information (working mode, AP SSID and IP address)
       summary: Get wifi info
       operationId: getWifi
       responses:
@@ -1352,18 +1358,18 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
-  /wifi/cfg:
+  /wifi/station/cfg:
     get:
       description: Returns the wifi station config (SSID and password)
-      summary: Find wifi config
-      operationId: getWifiCfg
+      summary: Find wifi station config
+      operationId: getWifiStationCfg
       responses:
         '200':
-          description: The current wifi config
+          description: The current wifi station config
           content:
             application/json:      
               schema:
-                $ref: '#/components/schemas/wifiCfg'
+                $ref: '#/components/schemas/wifiStationCfg'
         'default':
           description: Unexpected error
           content:
@@ -1373,20 +1379,67 @@ paths:
     post:
       description: Sets wifi station config and connects to the AP
       summary: Set wifi station config
-      operationId: setWifiCfg
+      operationId: setWifiStationCfg
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/wifiCfg'
+              $ref: '#/components/schemas/wifiStationCfg'
+      responses:
+        '200':
+          description: Successful, returns current wifi station config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wifiStationCfg'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+  /wifi/ap/cfg:
+    get:
+      description: Returns the wifi AP config (password and channel)
+      summary: Find wifi ap config
+      operationId: getWifiApCfg
+      responses:
+        '200':
+          description: The current wifi AP config
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/wifiApCfg'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      description: Sets wifi AP config
+      summary: Set wifi AP config
+      operationId: setWifiApCfg
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wifiApCfg'
       responses:
         '200':
           description: Successful, returns current wifi config
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wifiCfg'
+                $ref: '#/components/schemas/wifiApCfg'
         '400':
           description: Bad request.
           content:
@@ -1417,9 +1470,46 @@ paths:
             application/json:      
               schema:
                 $ref: '#/components/schemas/error'
+  /wifi/connect:
+    post:
+      description: Sets the wifi as STATION and connects to the AP saved into config
+      summary: Connect wifi to AP
+      operationId: connectWifi
+      responses:
+        '202':
+          description: Accepted, the device will try to connect to AP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/success'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
+  /wifi/disconnect:
+    post:
+      description: Disconnects from AP and sets the wifi as AP
+      summary: Disconnect wifi from AP
+      operationId: disconnectWifi
+      responses:
+        '202':
+          description: Accepted, disconnects from AP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/success'
+        'default':
+          description: Unexpected error
+          content:
+            application/json:      
+              schema:
+                $ref: '#/components/schemas/error'
 
 components:
   schemas:
+# app schemas
     command:
       type: object
       required:
@@ -1526,6 +1616,62 @@ components:
           items:
             $ref: '#/components/schemas/command'
       additionalProperties: false
+    relay:
+      type: object
+      required:
+      - pin
+      - reserved
+      - name
+      - logic
+      - status_at_boot
+      properties:
+        pin:
+          type: integer
+          format: int32
+          description: gpio pin
+          default: 1
+          minimum: 1
+          maximum: 8
+        reserved:
+          type: integer
+          format: int32
+          description: 0 -> the relay is available for use, 1 -> the relay is reserved
+          default: 0
+          minimum: 0    
+          maximum: 1
+        name:
+          type: string
+          description: a description of relay use 
+          pattern: '[ -~]{0,31}'
+          minLength: 0
+          maxLength: 31
+        logic:
+          type: integer
+          format: int32
+          description: the relay logic. 0 -> logic_undefined, 1-> pin_low_relay_closed, 2 -> pin_high_relay_closed
+          default: 1
+          minimum: 0    
+          maximum: 2
+        status_at_boot:
+          type: integer
+          format: int32
+          description: an relay status at boot. 0 -> status_undefined, 1-> open, 2 -> closed
+          default: 0
+          minimum: 0    
+          maximum: 2
+      additionalProperties: false
+    relayList:
+      type: object
+      required:
+      - relays
+      properties:
+        relays:
+          type: array
+          maxItems: 8
+          items:
+            $ref: '#/components/schemas/relay'
+      additionalProperties: false
+# espbot common schemas
     cron_status:
       type: object
       required:
@@ -2101,61 +2247,6 @@ components:
           minimum: 0
           maximum: 1
       additionalProperties: false
-    relay:
-      type: object
-      required:
-      - pin
-      - reserved
-      - name
-      - logic
-      - status_at_boot
-      properties:
-        pin:
-          type: integer
-          format: int32
-          description: gpio pin
-          default: 1
-          minimum: 1
-          maximum: 8
-        reserved:
-          type: integer
-          format: int32
-          description: 0 -> the relay is available for use, 1 -> the relay is reserved
-          default: 0
-          minimum: 0    
-          maximum: 1
-        name:
-          type: string
-          description: a description of relay use 
-          pattern: '[ -~]{0,31}'
-          minLength: 0
-          maxLength: 31
-        logic:
-          type: integer
-          format: int32
-          description: the relay logic. 0 -> logic_undefined, 1-> pin_low_relay_closed, 2 -> pin_high_relay_closed
-          default: 1
-          minimum: 0    
-          maximum: 2
-        status_at_boot:
-          type: integer
-          format: int32
-          description: an relay status at boot. 0 -> status_undefined, 1-> open, 2 -> closed
-          default: 0
-          minimum: 0    
-          maximum: 2
-      additionalProperties: false
-    relayList:
-      type: object
-      required:
-      - relays
-      properties:
-        relays:
-          type: array
-          maxItems: 8
-          items:
-            $ref: '#/components/schemas/relay'
-      additionalProperties: false
     success:
       type: object
       required:
@@ -2238,7 +2329,26 @@ components:
           minimum: -14
           maximum: 14
       additionalProperties: false
-    wifiCfg:
+    wifiApCfg:
+      type: object
+      required:
+      - ap_channel
+      - ap_pwd
+      properties:
+        ap_channel:
+          type: integer
+          format: int32
+          description: AP channel
+          default: 1
+          minimum: 1
+          maximum: 11
+        ap_pwd:
+          type: string
+          pattern: '[ -~]{1,63}'
+          minLength: 1
+          maxLength: 63
+      additionalProperties: false
+    wifiStationCfg:
       type: object
       required:
       - station_ssid
