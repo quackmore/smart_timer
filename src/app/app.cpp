@@ -31,7 +31,7 @@ extern "C"
 
 char *app_release = APP_RELEASE;
 
-char *app_name = "Smart Timer";
+char *app_name = "SMART_TIMER";
 
 void app_init_before_wifi(void)
 {
