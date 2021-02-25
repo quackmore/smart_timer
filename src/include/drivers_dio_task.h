@@ -6,14 +6,19 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
+#ifndef __DIO_TASK_H__
+#define __DIO_TASK_H__
 
-#ifndef __ESPBOT_HTTP_ROUTES_HPP__
-#define __ESPBOT_HTTP_ROUTES_HPP__
+#define DIO_TASK_QUEUE_LEN 4
+#define SIG_DO_SEQ_COMPLETED 1
+#define SIG_DI_SEQ_COMPLETED 2
 
-#include "espbot_http.hpp"
+typedef enum
+{
+  direct = 0,
+  task
+} CB_call_type;
 
-void init_controllers(void);
-void espbot_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
-void return_file(struct espconn *p_espconn, Http_parsed_req *parsed_req, char *filename);
+void init_dio_task(void);
 
 #endif

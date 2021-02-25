@@ -7,13 +7,26 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef __ESPBOT_HTTP_ROUTES_HPP__
-#define __ESPBOT_HTTP_ROUTES_HPP__
+#ifndef __WEBSERVER_HPP__
+#define __WEBSERVER_HPP__
 
-#include "espbot_http.hpp"
+// extern "C"
+// {
+// #include "c_types.h"
+// #include "espconn.h"
+// }
 
-void init_controllers(void);
-void espbot_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
-void return_file(struct espconn *p_espconn, Http_parsed_req *parsed_req, char *filename);
+#define SERVER_PORT 80
+
+typedef enum
+{
+  http_svr_up = 0,
+  http_svr_down
+} Http_svr_status;
+
+void http_svr_init(void);
+void http_svr_start(uint32);
+void http_svr_stop(void);
+Http_svr_status http_svr_get_status(void);
 
 #endif

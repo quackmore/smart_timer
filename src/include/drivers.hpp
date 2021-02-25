@@ -6,14 +6,9 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
+#ifndef __DRIVERS_HPP__
+#define __DRIVERS_HPP__
 
-#ifndef __ESPBOT_HTTP_ROUTES_HPP__
-#define __ESPBOT_HTTP_ROUTES_HPP__
-
-#include "espbot_http.hpp"
-
-void init_controllers(void);
-void espbot_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
-void return_file(struct espconn *p_espconn, Http_parsed_req *parsed_req, char *filename);
+extern char *drivers_release;
 
 #endif

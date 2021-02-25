@@ -6,22 +6,37 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
+#ifndef __CFGFILE_HPP__
+#define __CFGFILE_HPP__
 
-#ifndef __MDNS_HPP__
-#define __MDNS_HPP__
+#include "espbot_spiffs.hpp"
+#include "espbot_json.hpp"
 
-extern "C"
+enum {
+  CFG_ok = 0,
+  CFG_cantRestore,
+  CFG_error,
+  CFG_notUpdated
+};
+
+/**
+ * @brief Config file class
+ * A config file with JSON syntax
+ * 
+ */
+class Cfgfile: public Espfile, public JSONP
 {
-#include "espconn.h"
-}
+public:
+  char *_json_str;
+  
+  /**
+   * @brief Construct a new Cfgfile object
+   * 
+   * @param filename 
+   */
+  Cfgfile(char *filename);
+  ~Cfgfile();
+};
 
-void mdns_init(void);
-char *mdns_cfg_json_stringify(char *dest = NULL, int len = 0);
-int mdns_cfg_save(void);
-void mdns_enable(void);
-void mdns_disable(void);
-bool mdns_is_enabled(void);
-void mdns_start(char *app_alias);
-void mdns_stop(void);
 
 #endif

@@ -6,14 +6,15 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
+#ifndef __DRIVERS_H__
+#define __DRIVERS_H__
 
-#ifndef __ESPBOT_HTTP_ROUTES_HPP__
-#define __ESPBOT_HTTP_ROUTES_HPP__
+#include "c_types.h"
 
-#include "espbot_http.hpp"
 
-void init_controllers(void);
-void espbot_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
-void return_file(struct espconn *p_espconn, Http_parsed_req *parsed_req, char *filename);
+// these are espbot_2.0 memory management methods
+// https://github.com/quackmore/espbot_2.0
+void *call_espbot_zalloc(size_t size);
+void call_espbot_free(void *addr);
 
 #endif

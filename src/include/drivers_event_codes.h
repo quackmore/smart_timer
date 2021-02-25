@@ -6,14 +6,15 @@
  * think this stuff is worth it, you can buy me a beer in return. Quackmore
  * ----------------------------------------------------------------------------
  */
+#ifndef __DRIVERS_EVENT_CODES_H__
+#define __DRIVERS_EVENT_CODES_H__
 
-#ifndef __ESPBOT_HTTP_ROUTES_HPP__
-#define __ESPBOT_HTTP_ROUTES_HPP__
+#define DHT_HEAP_EXHAUSTED 0x5000
+#define DHT_READING_TIMEOUT 0x5001
+#define DHT_READING_CHECKSUM_ERR 0x5002
+#define DHT_READ_HEAP_EXHAUSTED 0x5003
 
-#include "espbot_http.hpp"
-
-void init_controllers(void);
-void espbot_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
-void return_file(struct espconn *p_espconn, Http_parsed_req *parsed_req, char *filename);
+#define MAX6675_THERMOCOUPLE_DISCONNECTED 0x5004
+#define MAX6675_HEAP_EXHAUSTED 0x5005
 
 #endif
