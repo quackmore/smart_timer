@@ -18,12 +18,11 @@ extern "C"
 
 #include "espbot.hpp"
 #include "espbot_cron.hpp"
-#include "espbot_global.hpp"
 #include "espbot_http_routes.hpp"
 #include "espbot_json.hpp"
 #include "espbot_utils.hpp"
-#include "espbot_webserver.hpp"
-#include "library.hpp"
+#include "espbot_http_server.hpp"
+#include "drivers.hpp"
 #include "app.hpp"
 #include "app_relay.hpp"
 #include "app_command.hpp"
@@ -670,7 +669,7 @@ static void put_api_command_idx(struct espconn *ptr_espconn, Http_parsed_req *pa
 
 static void get_api_info(struct espconn *ptr_espconn, Http_parsed_req *parsed_req)
 {
-    // {"device_name":"","chip_id":"","app_name":"","app_version":"","espbot_version":"","api_version":"","library_version":"","sdk_version":"","boot_version":""}
+    // {"device_name":"","chip_id":"","app_name":"","app_version":"","espbot_version":"","api_version":"","drivers_version":"","sdk_version":"","boot_version":""}
     ALL("get_api_info");
     int str_len = 155 +
                   os_strlen(espbot.get_name()) +
@@ -679,7 +678,7 @@ static void get_api_info(struct espconn *ptr_espconn, Http_parsed_req *parsed_re
                   os_strlen(app_release) +
                   os_strlen(espbot.get_version()) +
                   os_strlen(f_str(API_RELEASE)) +
-                  os_strlen(library_release) +
+                  os_strlen(drivers_release) +
                   os_strlen(system_get_sdk_version()) +
                   10 +
                   1;
@@ -701,9 +700,9 @@ static void get_api_info(struct espconn *ptr_espconn, Http_parsed_req *parsed_re
                app_release,
                espbot.get_version());
     fs_sprintf(msg.ref + os_strlen(msg.ref),
-               "\"api_version\":\"%s\",\"library_version\":\"%s\",",
+               "\"api_version\":\"%s\",\"drivers_version\":\"%s\",",
                f_str(API_RELEASE),
-               library_release);
+               drivers_release);
     fs_sprintf(msg.ref + os_strlen(msg.ref),
                "\"sdk_version\":\"%s\",\"boot_version\":\"%d\"}",
                system_get_sdk_version(),

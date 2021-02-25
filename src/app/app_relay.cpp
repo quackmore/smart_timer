@@ -12,9 +12,8 @@ extern "C"
 #include "c_types.h"
 }
 
-#include "espbot_config.hpp"
+#include "espbot_cfgfile.hpp"
 #include "espbot_cron.hpp"
-#include "espbot_global.hpp"
 #include "espbot_json.hpp"
 #include "espbot_mem_macros.h"
 #include "espbot_utils.hpp"

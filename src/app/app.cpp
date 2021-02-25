@@ -14,7 +14,6 @@ extern "C"
 }
 
 #include "espbot_cron.hpp"
-#include "espbot_global.hpp"
 #include "app.hpp"
 #include "app_relay.hpp"
 #include "app_command.hpp"

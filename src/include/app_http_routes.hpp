@@ -11,7 +11,7 @@
 #define __APP_HTTP_ROUTES_HPP__
 
 #include "espbot_http.hpp"
-#include "espbot_webserver.hpp"
+#include "espbot_http_server.hpp"
 
 bool app_http_routes(struct espconn *ptr_espconn, Http_parsed_req *parsed_req);
 

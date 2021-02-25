@@ -1694,7 +1694,7 @@ components:
       - app_version
       - espbot_version
       - api_version
-      - library_version
+      - drivers_version
       - sdk_version
       - boot_version
       properties:
@@ -1728,7 +1728,7 @@ components:
           pattern: '[ -~]{1,10}'
           minLength: 1
           maxLength: 10
-        library_version:
+        drivers_version:
           type: string
           pattern: '[ -~]{1,63}'
           minLength: 1
