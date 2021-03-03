@@ -259,7 +259,6 @@ static int command_list_restore(void)
     command_list[idx].id = cmd_idx.getInt(f_str("id"));
     os_memset(command_list[idx].name, 0, 32);
     cmd_idx.getStr(f_str("name"), command_list[idx].name, 32);
-    command_list[idx].job_id = cmd_idx.getInt(f_str("job_id"));
     command_list[idx].enabled = (bool)cmd_idx.getInt(f_str("enabled"));
     command_list[idx].type = (enum command_t)cmd_idx.getInt(f_str("type"));
     command_list[idx].exe_time.minutes = cmd_idx.getInt(f_str("min"));
@@ -311,7 +310,6 @@ static int saved_command_list_updated(void)
     tmp_cmd.id = cmd_idx.getInt(f_str("id"));
     os_memset(tmp_cmd.name, 0, 32);
     cmd_idx.getStr(f_str("name"), tmp_cmd.name, 32);
-    tmp_cmd.job_id = cmd_idx.getInt(f_str("job_id"));
     tmp_cmd.enabled = (bool)cmd_idx.getInt(f_str("enabled"));
     tmp_cmd.type = (enum command_t)cmd_idx.getInt(f_str("type"));
     tmp_cmd.exe_time.minutes = cmd_idx.getInt(f_str("min"));
