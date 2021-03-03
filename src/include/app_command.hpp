@@ -58,5 +58,10 @@ int command_update(int id,
 // returns command id
 // or -1 on error
 int command_delete(int id);
+int command_list_save(void);
+
+char *command_json_stringify(int idx, char *dest = NULL, int len = 0);
+char *command_list_json_stringify(char *dest = NULL, int len = 0);
+
 
 #endif

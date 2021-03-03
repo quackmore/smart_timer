@@ -59,9 +59,13 @@ struct relay
 
 void app_relay_init(void);
 
+struct relay *get_relay(int pin);
 // conf_relay returns 0 for success, !0 for error
 int conf_relay(enum contact_pin, char *, enum contact_logic, enum contact_status);
-struct relay *get_relay(int pin);
+int relay_list_save(void);
+
+char *relay_json_stringify(int idx, char *dest = NULL, int len = 0);
+char *relay_list_json_stringify(char *dest = NULL, int len = 0);
 
 
 void close_relay(struct relay *);

@@ -26,4 +26,7 @@ void app_deinit_on_wifi_disconnect(void);
 extern char *app_name;
 extern char *app_release;
 
+char *app_info_json_stringify(char *dest = NULL, int len = 0);
+
+
 #endif
